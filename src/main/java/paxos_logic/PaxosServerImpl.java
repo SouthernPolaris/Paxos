@@ -1,7 +1,6 @@
 package paxos_logic;
 
 import java.net.Socket;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -251,5 +250,80 @@ public class PaxosServerImpl {
 
     public String getElectedLeaderId() {
         return this.electedLeaderId;
+    }
+
+    public boolean checkProposals(String newProposal, String currentProposal) {
+        if(newProposal == null) {
+            return false;
+        }
+
+        if(currentProposal == null) {
+            return true;
+        }
+
+        if (newProposal.equals(currentProposal)) {
+            return true;
+        }
+
+        String[] newParts = newProposal.split(":");
+        String[] currentParts = currentProposal.split(":");
+
+        int newCounter = Integer.parseInt(newParts[1]);
+        int currentCounter = Integer.parseInt(currentParts[1]);
+
+        if (newCounter != currentCounter) {
+            return newCounter > currentCounter;
+        }
+
+        // If counters are equal, compare member IDs lexicographically
+        // TODO: Double check this works
+        return newParts[0].compareTo(currentParts[0]) > 0;
+    }
+
+    private void setProposalTimeout(String proposalNum) {
+        String taskKey = "proposal:" + proposalNum;
+
+        Runnable timeoutTask = () -> {
+            lock.lock();
+            try {
+                System.out.println("Proposal " + proposalNum + " timed out waiting for PROMISES.");
+                currentPromises.remove(proposalNum);
+            } finally {
+                lock.unlock();
+            }
+        };
+
+        ScheduledFuture<?> scheduledFuture = scheduler.schedule(timeoutTask, 20, java.util.concurrent.TimeUnit.SECONDS);
+        scheduledTasks.put(taskKey, scheduledFuture);
+    }
+
+    private void timeoutAcceptRequestMessage(String proposalNum) {
+        String taskKey = "accept:" + proposalNum;
+
+        Runnable timeoutTask = () -> {
+            lock.lock();
+            try {
+                System.out.println("Proposal " + proposalNum + " timed out waiting for ACCEPTEDS.");
+                currentAccepted.remove(proposalNum);
+            } finally {
+                lock.unlock();
+            }
+        };
+
+        ScheduledFuture<?> scheduledFuture = scheduler.schedule(timeoutTask, 20, java.util.concurrent.TimeUnit.SECONDS);
+        scheduledTasks.put(taskKey, scheduledFuture);
+    }
+
+    private void cancelTimeoutEvent(String taskKey) {
+        lock.lock();
+        try {
+            ScheduledFuture<?> scheduledFuture = scheduledTasks.get(taskKey);
+            if (scheduledFuture != null) {
+                scheduledFuture.cancel(false);
+                scheduledTasks.remove(taskKey);
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 }
