@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import member.Member;
 import network.NetworkTransport;
 
-public class PaxosServerImpl {
+public class PaxosServerImpl implements PaxosServer {
     private String electedLeaderId = null;
     
     private List<Member> members;
@@ -242,6 +242,10 @@ public class PaxosServerImpl {
         } finally {
             lock.unlock();
         }
+    }
+
+    public void setNetworkTransportInstance(NetworkTransport networkTransport) {
+        this.networkTransport = networkTransport;
     }
 
     public void setElectedLeaderId(String leaderId) {

@@ -123,7 +123,7 @@ public class Member {
     }
 
     
-    public void sendPrepareMessage(String proposalId, String proposalNum) {
+    public void sendPrepareMessage() {
         if (disconnect()) {
             System.out.println(String.format("[%s] (disconnected - cannot send PREPARE)", memberId));
             return;
@@ -138,8 +138,8 @@ public class Member {
             return;
         }
 
-        String prepareMessage = String.format("PREPARE %s", proposalNum);
         String proposalNumber = createProposalNumber();
+        String prepareMessage = String.format("PREPARE %s", proposalNumber);
 
         try {
             paxosServer.broadcastMessage(prepareMessage);

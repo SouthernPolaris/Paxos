@@ -9,4 +9,6 @@ public interface PaxosServer {
 
     public Map<String, Socket> getMemberSockets();
     public Map<String, Integer> getMemberPorts();
+
+    void setNetworkTransportInstance(network.NetworkTransport networkTransport);
 }
