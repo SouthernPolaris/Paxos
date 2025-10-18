@@ -122,13 +122,13 @@ public class PaxosServerImpl {
         if (currMember.getMaxProposalNum() == null || proposalBoolean) {
             currMember.setMaxProposalNum(proposalNum);
 
-            if(currMember.getAcceptedValue() != null) {
-                currMember.sendPromiseMessage(proposalId, proposalNum, currMember.getAcceptedProposalNum());
+            if(currMember.getAcceptedProposalNumber() != null) {
+                currMember.sendPromiseMessage(proposalId, proposalNum, currMember.getAcceptedProposalNumber());
             } else {
                 currMember.sendPromiseMessage(proposalId, proposalNum, null);
             }
         } else {
-            currMember.sendRejectMessage(proposalId, proposalNum);
+            currMember.sendRejectMessage(proposalNum);
         }
 
         setProposalTimeout(proposalNum);
@@ -154,8 +154,7 @@ public class PaxosServerImpl {
             if (parts.length > 2) {
                 String acceptedProposalId = parts[2];
                 String acceptedProposalNumber = parts[3];
-                currMember.setAcceptedProposalId(acceptedProposalId);
-                currMember.setAcceptedProposalNumber(acceptedProposalNumber);
+                currMember.setAcceptedProposal(proposalNum, acceptedProposalId, acceptedProposalNumber);
             }
 
             // Majority (out of 9 members)
@@ -202,7 +201,7 @@ public class PaxosServerImpl {
             currMember.setMaxProposalNum(proposalNum);
             currMember.sendAcceptedMessage(proposalId, proposalNum, proposalValue);
         } else {
-            currMember.sendRejectMessage(proposalId, proposalNum);
+            currMember.sendRejectMessage(proposalNum);
         }
 
         timeoutAcceptRequestMessage(proposalNum);
