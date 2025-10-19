@@ -75,6 +75,32 @@ Each line contains:
 Name,hostname,port,RELIABILITY_TYPE
 ```
 
+Adjust the config files in `conf/` as required by your test scenarios.
+
 ## How tests are structured
 
 - Unit tests are in `src/test/java` and are executed by `mvn test`.
+
+### Design decisions
+
+This section documents the key design decisions made while implementing the Paxos messages and related infrastructure
+
+- Serializable message types (one class per message):
+  - Each Paxos message type has its own Java class under `paxos_util/` (for example `Prepare`, `Promise`, `AcceptRequest`, `Accepted`, `PaxosMessage`). This keeps the code explicit and type-safe and makes tests and mocks straightforward
+
+- `ProposalNumber` as a value object:
+  - Proposal numbers are represented with a dedicated `ProposalNumber` class (`paxos_util/ProposalNumber.java`) that implements `Comparable<ProposalNumber>`
+  - It encapsulates a (proposer id, sequence) pair and provides deterministic ordering (first by sequence, then by proposer id as tiebreaker)
+  - Using a value object simplifies comparisons, equality checks, and improves readability compared to passing raw strings around
+
+- JSON serialization with Gson:
+  - Messages are serialized to/from JSON when sent over the `MemberTransport` abstraction. The project uses Gson (`com.google.code.gson`) for JSON serialization
+  - Gson is simple to configure and produces compact JSON which is convenient for test logs and human inspection
+
+- Transport abstraction (`MemberTransport`):
+  - Networking is abstracted behind the `MemberTransport` interface. This allows unit tests to inject mocks (`Mockito`) without starting network sockets
+  - A `SocketTransport` implementation is provided for real network runs
+
+- Thread-safety and locking:
+  - Acceptors use a `ReentrantLock` to protect updates to `promisedNumber`, `acceptedNumber`, and `acceptedValue` to ensure correctness under concurrent incoming messages
+  - The `handlePrepare` and `handleAcceptRequest` methods hold the lock while checking and updating the local state and sending replies. This avoids race conditions

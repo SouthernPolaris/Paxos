@@ -1,21 +1,16 @@
-[Member M8] - Listening on port 9008
-[Member M8] Command port listening on 9108
-[Acceptor M8] Received Prepare(M5:1) from Proposer M5
-[Acceptor M8] Sent Promise for M5:1 to Proposer M5
-[Acceptor M8] Received AcceptRequest(M5:1, 'M5') from Proposer M5
-[Acceptor M8] Accepted proposal M5:1 with value 'M5'
-[Acceptor M8] Received AcceptRequest(M5:1, 'M5') from Proposer M5
-[Acceptor M8] Accepted proposal M5:1 with value 'M5'
-[Acceptor M8] Received AcceptRequest(M5:1, 'M5') from Proposer M5
-[Acceptor M8] Accepted proposal M5:1 with value 'M5'
-[Acceptor M8] Received AcceptRequest(M5:1, 'M5') from Proposer M5
-[Acceptor M8] Accepted proposal M5:1 with value 'M5'
-[Acceptor M8] Received AcceptRequest(M5:1, 'M5') from Proposer M5
-[Acceptor M8] Accepted proposal M5:1 with value 'M5'
-Learner M8 has learned the value: M5 for proposal number: M5:1
-Learner M8 has learned the value: M5 for proposal number: M5:1
-Learner M8 has learned the value: M5 for proposal number: M5:1
-Learner M8 has learned the value: M5 for proposal number: M5:1
-Learner M8 has learned the value: M5 for proposal number: M5:1
-Learner M8 has learned the value: M5 for proposal number: M5:1
+java.net.BindException: Address already in use
+	at java.base/sun.nio.ch.Net.bind0(Native Method)
+	at java.base/sun.nio.ch.Net.bind(Net.java:555)
+	at java.base/sun.nio.ch.Net.bind(Net.java:544)
+	at java.base/sun.nio.ch.NioSocketImpl.bind(NioSocketImpl.java:648)
+	at java.base/java.net.ServerSocket.bind(ServerSocket.java:388)
+	at java.base/java.net.ServerSocket.<init>(ServerSocket.java:274)
+	at java.base/java.net.ServerSocket.<init>(ServerSocket.java:167)
+	at network.SocketTransport.startListening(SocketTransport.java:43)
+	at member.CouncilMember.main(CouncilMember.java:75)
+	at org.codehaus.mojo.exec.ExecJavaMojo.doMain(ExecJavaMojo.java:371)
+	at org.codehaus.mojo.exec.ExecJavaMojo.doExec(ExecJavaMojo.java:360)
+	at org.codehaus.mojo.exec.ExecJavaMojo.lambda$execute$0(ExecJavaMojo.java:280)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+[Member M8] Failed to start command server: Address already in use
 [Member M8] Shutting down...
