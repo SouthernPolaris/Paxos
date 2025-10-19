@@ -16,27 +16,27 @@ import paxos_util.*;
  * Responsible for initiating proposals and handling promises/acceptances from Acceptors.
  */
 public class Proposer {
-    private final int id;
-    private final Set<Integer> acceptorIds;
-    private final MemberTransport networkTransport;
-
+    private final String id;
+    private final Set<String> acceptorIds;
+    
+    private MemberTransport networkTransport;
     private final ReentrantLock lock = new ReentrantLock();
-
+    
     private final Gson gson = new GsonBuilder().create();
 
     private ProposalNumber proposalNumber;
     private String proposalValue;
 
-    private final Map<Integer, Promise> promisesReceived = new ConcurrentHashMap<>();
-    private final Set<Integer> acceptedReceivedFrom = ConcurrentHashMap.newKeySet();
+    private final Map<String, Promise> promisesReceived = new ConcurrentHashMap<>();
+    private final Set<String> acceptedReceivedFrom = ConcurrentHashMap.newKeySet();
 
     private int localSequence = 0;
 
-    public Proposer(int id, Set<Integer> acceptorIds, MemberTransport networkTransport) {
+    public Proposer(String id, Set<String> acceptorIds, MemberTransport networkTransport) {
         this.id = id;
         this.acceptorIds = acceptorIds;
         this.networkTransport = networkTransport;
-        this.proposalNumber = new ProposalNumber("M" + id + ":0");
+        this.proposalNumber = new ProposalNumber(id + ":0");
     }
 
     /**
@@ -48,7 +48,7 @@ public class Proposer {
         try {
             this.proposalValue = value;
             localSequence++;
-            this.proposalNumber = new ProposalNumber("M" + id + ":" + localSequence);
+            this.proposalNumber = new ProposalNumber(id + ":" + localSequence);
 
             System.out.println("[Proposer " + id + "] Starting proposal " + proposalNumber + " with value '" + proposalValue + "'");
             sendPrepareMessage();
@@ -61,7 +61,7 @@ public class Proposer {
      * Sends a Prepare message to all Acceptors.
      */
     private void sendPrepareMessage() {
-        Prepare prepareMessage = new Prepare(proposalNumber);
+        Prepare prepareMessage = new Prepare(id, proposalNumber);
         broadcastToAcceptors(prepareMessage);
         System.out.println("[Proposer " + id + "] Sent Prepare for " + proposalNumber + " to " + acceptorIds);
     }
@@ -70,10 +70,12 @@ public class Proposer {
      * Broadcasts a message to all Acceptors.
      */
     private void broadcastToAcceptors(Object message) {
-        String messageJson = gson.toJson(message);
-        
-        for (int acceptorId : acceptorIds) {
-            networkTransport.sendMessage(String.valueOf(acceptorId), messageJson);
+        if (message instanceof PaxosMessage pm) {
+            pm.fromMemberId = id;
+        }
+
+        for (String acceptorId : acceptorIds) {
+            networkTransport.sendMessage(acceptorId, message);
         }
     }
 
@@ -85,8 +87,7 @@ public class Proposer {
         lock.lock();
 
         try {
-            // TODO: Check if this causes by reference issues instead of creating a copy
-            ProposalNumber incomingNum = new ProposalNumber(promise.proposalNumber.toString());
+            ProposalNumber incomingNum = new ProposalNumber(promise.proposalNum.toString());
 
             if (!incomingNum.equals(proposalNumber)) {
                 System.out.println("[Proposer " + id + "] Ignored Promise for " + incomingNum + " (expected " + proposalNumber + ")");
@@ -124,7 +125,7 @@ public class Proposer {
         lock.lock();
 
         try {
-            AcceptRequest acceptRequest = new AcceptRequest(proposalNumber, proposalValue);
+            AcceptRequest acceptRequest = new AcceptRequest(id, proposalNumber, proposalValue);
             broadcastToAcceptors(acceptRequest);
             System.out.println("[Proposer " + id + "] Sent Accept Request for " + proposalNumber + " with value '" + proposalValue + "'");
         } finally {
@@ -139,7 +140,7 @@ public class Proposer {
         lock.lock();
 
         try {
-            ProposalNumber incomingNum = new ProposalNumber(accepted.proposalNumber.toString());
+            ProposalNumber incomingNum = new ProposalNumber(accepted.proposalNum.toString());
 
             if (!incomingNum.equals(proposalNumber)) {
                 System.out.println("[Proposer " + id + "] Ignored Accepted for " + incomingNum + " (expected " + proposalNumber + ")");
@@ -169,8 +170,8 @@ public class Proposer {
 
         System.out.println("[Proposer " + id + "] Notifying learners about chosen proposal " + proposalNumber + " with value '" + proposalValue + "'");
 
-        for (int learnerId : acceptorIds) {
-            networkTransport.sendMessage(String.valueOf(learnerId), acceptedJson);
+        for (String learnerId : acceptorIds) {
+            networkTransport.sendMessage(learnerId, acceptedJson);
         }
     }
 
@@ -180,4 +181,9 @@ public class Proposer {
     private int calculateMajority() {
         return (acceptorIds.size() / 2) + 1;
     }
+
+    public void setTransport(MemberTransport transport) {
+        this.networkTransport = transport;
+    }
+
 }

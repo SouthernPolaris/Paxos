@@ -1,17 +1,12 @@
 package paxos_util;
 
-public class Promise {
-    public String type = "PROMISE";
-    public final ProposalNumber proposalNumber;
-    public final String acceptedProposalNumber;
-    public final String acceptedProposalValue;
+public class Promise extends PaxosMessage {
+    public String acceptedProposalNumber; // highest accepted proposal number (can be null)
+    public String acceptedProposalValue;  // value of that proposal (can be null)
 
-    public final Integer fromMemberId;
-
-    public Promise(ProposalNumber proposalNumber, String acceptedProposalNumber, String acceptedProposalValue, Integer fromMemberId) {
-        this.proposalNumber = proposalNumber;
+    public Promise(String fromMemberId, ProposalNumber proposalNumber, String acceptedProposalNumber, String acceptedProposalValue) {
+        super("PROMISE", fromMemberId, proposalNumber, null);
         this.acceptedProposalNumber = acceptedProposalNumber;
         this.acceptedProposalValue = acceptedProposalValue;
-        this.fromMemberId = fromMemberId;
     }
 }

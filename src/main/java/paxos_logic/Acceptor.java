@@ -15,10 +15,10 @@ import paxos_util.*;
  * Handles Prepare and Accept Request messages from Proposers and responds accordingly.
  */
 public class Acceptor {
-    private final int memberId;
-    private final MemberTransport networkTransport;
-    private final Set<Integer> learnerIds;
-
+    private final String memberId;
+    private final Set<String> learnerIds;
+    
+    private MemberTransport networkTransport;
     private final ReentrantLock lock = new ReentrantLock();
 
     private ProposalNumber promisedNumber = null;
@@ -27,7 +27,7 @@ public class Acceptor {
 
     private final Gson gson = new GsonBuilder().create();
 
-    public Acceptor(int memberId, MemberTransport networkTransport, Set<Integer> learnerIds) {
+    public Acceptor(String memberId, MemberTransport networkTransport, Set<String> learnerIds) {
         this.memberId = memberId;
         this.networkTransport = networkTransport;
         this.learnerIds = learnerIds;
@@ -36,21 +36,21 @@ public class Acceptor {
     /**
      * Handles a Prepare message from a Proposer.
      */
-    public void handlePrepare(Prepare prepare, int fromProposerId) {
+    public void handlePrepare(Prepare prepare, String fromProposerId) {
         lock.lock();
 
         try {
-            ProposalNumber proposalNum = new ProposalNumber(prepare.proposalNumber.toString());
+            ProposalNumber proposalNum = new ProposalNumber(prepare.proposalNum.toString());
             System.out.println("[Acceptor " + memberId + "] Received Prepare(" + proposalNum + ") from Proposer " + fromProposerId);
 
             if (promisedNumber == null || proposalNum.compareTo(promisedNumber) > 0) {
                 promisedNumber = proposalNum;
 
                 Promise promise = new Promise(
+                    String.valueOf(memberId),
                     proposalNum,
                     acceptedNumber != null ? acceptedNumber.toString() : null,
-                    acceptedValue,
-                    memberId
+                    acceptedValue
                 );
 
                 String promiseJson = gson.toJson(promise);
@@ -67,11 +67,11 @@ public class Acceptor {
     /**
      * Handles an Accept Request from a Proposer.
      */
-    public void handleAcceptRequest(AcceptRequest acceptRequest, int fromProposerId) {
+    public void handleAcceptRequest(AcceptRequest acceptRequest, String fromProposerId) {
         lock.lock();
 
         try {
-            ProposalNumber proposalNum = new ProposalNumber(acceptRequest.proposalNumber.toString());
+            ProposalNumber proposalNum = new ProposalNumber(acceptRequest.proposalNum.toString());
             System.out.println("[Acceptor " + memberId + "] Received AcceptRequest(" + proposalNum + ", '" + acceptRequest.proposalValue + "') from Proposer " + fromProposerId);
 
             if (promisedNumber == null || proposalNum.compareTo(promisedNumber) >= 0) {
@@ -86,8 +86,8 @@ public class Acceptor {
                 networkTransport.sendMessage(String.valueOf(fromProposerId), acceptedJson);
 
                 // Notify learners
-                for (int learnerId : learnerIds) {
-                    networkTransport.sendMessage(String.valueOf(learnerId), acceptedJson);
+                for (String learnerId : learnerIds) {
+                    networkTransport.sendMessage(learnerId, acceptedJson);
                 }
 
                 System.out.println("[Acceptor " + memberId + "] Accepted proposal " + proposalNum + " with value '" + acceptedValue + "'");
@@ -98,4 +98,9 @@ public class Acceptor {
             lock.unlock();
         }
     }
+
+    public void setTransport(MemberTransport transport) {
+        this.networkTransport = transport;
+    }
+
 }

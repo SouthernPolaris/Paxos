@@ -11,14 +11,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantLock;
 
 import member.Profile;
+import paxos_util.PaxosMessage;
 
 public class SocketTransport implements MemberTransport {
     private final String memberId;
     private final Integer port;
-    private final Map<String, InetSocketAddress> members;
+    private Map<String, InetSocketAddress> members;
 
-    private final PaxosNode paxosNode;
-    private final Profile profile;
+    private PaxosNode paxosNode;
+    private Profile profile;
 
     private ServerSocket serverSocket;
     private final ReentrantLock lock = new ReentrantLock();
@@ -73,8 +74,8 @@ public class SocketTransport implements MemberTransport {
                     Thread.sleep(delay);
 
                     // Deserialize to a generic map to extract senderId
-                    Map<?, ?> map = gson.fromJson(jsonMessage, Map.class);
-                    String senderId = String.valueOf(map.get("fromMemberId"));
+                    PaxosMessage msg = gson.fromJson(jsonMessage, PaxosMessage.class);
+                    String senderId = msg.fromMemberId;
 
                     paxosNode.handleMessage(senderId, jsonMessage);
                 }
@@ -98,7 +99,19 @@ public class SocketTransport implements MemberTransport {
 
     @Override
     public void sendMessage(String targetId, Object message) {
-        if (profile == Profile.FAILURE) return;
+        if (profile == Profile.FAILURE) {
+            // Optionally crash after sending first message
+            if (crashAfterSend) {
+                if (hasSentFirstMessage) {
+                    System.out.println("[Member " + memberId + "] Crashing after sending first message!");
+                    System.exit(1);
+                } else {
+                    hasSentFirstMessage = true;
+                }
+            } else {
+                return; // skip sending
+            }
+        }
 
         InetSocketAddress address = members.get(targetId);
         if (address == null) {
@@ -112,7 +125,7 @@ public class SocketTransport implements MemberTransport {
             try {
                 Thread.sleep(simulateDelay());
                 try (Socket socket = new Socket(address.getHostName(), address.getPort());
-                     PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
+                    PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
                     out.println(jsonMessage);
                     out.flush();
                 }
@@ -131,4 +144,9 @@ public class SocketTransport implements MemberTransport {
             lock.unlock();
         }
     }
+
+    public void setCrashAfterSend(boolean crash) {
+        this.crashAfterSend = crash;
+    }
+    
 }

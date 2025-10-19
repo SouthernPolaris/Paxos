@@ -2,6 +2,7 @@ package member;
 
 import network.*;
 import paxos_logic.*;
+import paxos_util.*;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -10,31 +11,54 @@ import java.util.stream.Collectors;
 
 public class CouncilMember {
     public static void main(String[] args) throws Exception {
-        if(args.length < 2) {
-            System.out.println("Usage: java CouncilMember <memberId> --profile <profile>");
+        if(args.length < 1) {
+            System.out.println("Usage: java CouncilMember <memberId>");
             return;
         }
 
         String memberId = args[0];
-        Profile profile = Profile.valueOf(args[2].toUpperCase());
 
         // Load network.config
-        Map<String, InetSocketAddress> members = loadConfig("network.config");
+        Map<String, MemberConfig> allConfigs = loadNetworkConfig("conf/network.config");
 
-        Set<Integer> acceptorIds = members.keySet().stream()
-                .map(s -> Integer.parseInt(s.replace("M","")))
-                .collect(Collectors.toSet());
+        if (!allConfigs.containsKey(memberId)) {
+            System.out.println("Error: Member ID " + memberId + " not found in network.config");
+            return;
+        }
 
-        Set<Integer> learnerIds = new HashSet<>(acceptorIds);
+        MemberConfig myConfig = allConfigs.get(memberId);
 
-        // Create Paxos node
+        Set<String> acceptorIds = new HashSet<>(allConfigs.keySet());
+
+
+        Set<String> learnerIds = new HashSet<>(acceptorIds);
+
+        // Create Paxos node first (no transport yet)
         PaxosNode node = new PaxosNode(memberId, acceptorIds, learnerIds, null);
-        SocketTransport transport = new SocketTransport(memberId, members.get(memberId).getPort(), members, node, profile);
 
-        node = new PaxosNode(memberId, acceptorIds, learnerIds, transport);
+        // Create transport and link to node
+        SocketTransport transport = new SocketTransport(
+            memberId,
+            myConfig.port,
+            allConfigs.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().address)),
+            node,
+            myConfig.profile
+        );
 
-        // Optional: trigger proposal from console
-        if(profile != Profile.FAILURE) {
+        if (myConfig.profile == Profile.FAILURE) {
+            transport.setCrashAfterSend(true);
+        }
+
+        // Now attach the transport back into the node
+        node.setTransport(transport);
+
+        // Start listening (this was previously done inside PaxosNode constructor)
+        transport.startListening();
+
+
+        // Optional: trigger proposal from console if not failure
+        if(myConfig.profile != Profile.FAILURE) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Enter candidate to propose:");
             String candidate = reader.readLine();
@@ -42,18 +66,19 @@ public class CouncilMember {
         }
     }
 
-    private static Map<String, InetSocketAddress> loadConfig(String path) throws IOException {
-        Map<String, InetSocketAddress> members = new HashMap<>();
-        try(BufferedReader br = new BufferedReader(new FileReader(path))) {
+    private static Map<String, MemberConfig> loadNetworkConfig(String path) throws IOException {
+        Map<String, MemberConfig> map = new HashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;
-            while((line = br.readLine()) != null) {
+            while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
                 String memberId = parts[0];
                 String host = parts[1];
                 int port = Integer.parseInt(parts[2]);
-                members.put(memberId, new InetSocketAddress(host, port));
+                Profile profile = Profile.valueOf(parts[3].toUpperCase());
+                map.put(memberId, new MemberConfig(host, port, profile));
             }
         }
-        return members;
+        return map;
     }
 }

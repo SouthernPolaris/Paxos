@@ -8,14 +8,14 @@ import paxos_util.Accepted;
 import java.util.*;
 
 public class Learner {
-    private final Integer memberId;
+    private final String memberId;
     private final Integer totalAcceptors;
 
     private final ReentrantLock lock = new ReentrantLock();
 
-    private final Map<String, Set<Integer>> acceptedValues = new ConcurrentHashMap<>();
+    private final Map<String, Set<String>> acceptedValues = new ConcurrentHashMap<>();
 
-    public Learner(Integer memberId, Integer totalAcceptors) {
+    public Learner(String memberId, Integer totalAcceptors) {
         this.memberId = memberId;
         this.totalAcceptors = totalAcceptors;
     }
@@ -25,13 +25,14 @@ public class Learner {
         lock.lock();
 
         try {
-            String key = accepted.proposalNumber + ":" + accepted.proposalValue;
+            String key = accepted.proposalNum + ":" + accepted.proposalValue;
+
             acceptedValues.computeIfAbsent(key, k -> ConcurrentHashMap.newKeySet()).add(accepted.fromMemberId);
 
             Integer count = acceptedValues.get(key).size();
 
-            if (count > computeMajority()) {
-                System.out.println("Learner " + memberId + " has learned the value: " + accepted.proposalValue + " for proposal number: " + accepted.proposalNumber);
+            if (count >= computeMajority()) {
+                System.out.println("Learner " + memberId + " has learned the value: " + accepted.proposalValue + " for proposal number: " + accepted.proposalNum);
                 // Once learned, we can clear the accepted values to avoid re-learning
                 // Unsure if this is the best way to handle it or if even needed
                 acceptedValues.remove(key);

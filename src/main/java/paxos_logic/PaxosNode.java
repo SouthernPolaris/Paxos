@@ -16,14 +16,13 @@ public class PaxosNode {
 
     private final Gson gson = new Gson();
 
-    public PaxosNode(String memberId, Set<Integer> acceptorIds, Set<Integer> learnerIds, MemberTransport memberTransport) {
+    public PaxosNode(String memberId, Set<String> acceptorIds, Set<String> learnerIds, MemberTransport memberTransport) {
         this.memberId = memberId;
         this.memberTransport = memberTransport;
 
-        int numericId = Integer.parseInt(memberId.replace("M", ""));
-        this.proposer = new Proposer(numericId, acceptorIds, memberTransport);
-        this.acceptor = new Acceptor(numericId, memberTransport, learnerIds);
-        this.learner = new Learner(numericId, acceptorIds.size());
+        this.proposer = new Proposer(memberId, acceptorIds, memberTransport);
+        this.acceptor = new Acceptor(memberId, memberTransport, learnerIds);
+        this.learner = new Learner(memberId, acceptorIds.size());
 
         if (memberTransport != null) {
             memberTransport.startListening();
@@ -36,18 +35,16 @@ public class PaxosNode {
     public void handleMessage(String senderId, String message) {
         try {
             // Try to detect the message type by reading a "type" field
-            BaseMessage base = gson.fromJson(message, BaseMessage.class);
+            PaxosMessage base = gson.fromJson(message, PaxosMessage.class);
             if (base == null || base.type == null) {
                 System.out.println("[PaxosNode " + memberId + "] Unknown message format: " + message);
                 return;
             }
 
-            int numericSender = Integer.parseInt(senderId.replace("M", ""));
-
             switch (base.type) {
                 case "PREPARE":
                     Prepare prepare = gson.fromJson(message, Prepare.class);
-                    acceptor.handlePrepare(prepare, numericSender);
+                    acceptor.handlePrepare(prepare, senderId);
                     break;
 
                 case "PROMISE":
@@ -57,7 +54,7 @@ public class PaxosNode {
 
                 case "ACCEPT_REQUEST":
                     AcceptRequest acceptRequest = gson.fromJson(message, AcceptRequest.class);
-                    acceptor.handleAcceptRequest(acceptRequest, numericSender);
+                    acceptor.handleAcceptRequest(acceptRequest, senderId);
                     break;
 
                 case "ACCEPTED":
@@ -89,10 +86,10 @@ public class PaxosNode {
         return memberId; 
     }
 
-    /**
-     * Helper class to detect the type of incoming message
-     */
-    private static class BaseMessage {
-        String type;
+    public void setTransport(MemberTransport transport) {
+        if (transport == null) return;
+        this.acceptor.setTransport(transport);
+        this.proposer.setTransport(transport);
     }
+
 }

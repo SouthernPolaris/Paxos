@@ -1,10 +1,7 @@
 package paxos_util;
 
-public class Prepare {
-    public String type = "PREPARE";
-    public final ProposalNumber proposalNumber;
-
-    public Prepare(ProposalNumber proposalNumber) {
-        this.proposalNumber = proposalNumber;
+public class Prepare extends PaxosMessage {
+    public Prepare(String fromMemberId, ProposalNumber proposalNumber) {
+        super("PREPARE", fromMemberId, proposalNumber, null);
     }
 }
