@@ -138,7 +138,9 @@ public class SocketTransport implements MemberTransport {
     public void shutdown() {
         lock.lock();
         try {
-            if (serverSocket != null) serverSocket.close();
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+            }
         } catch (IOException ignored) {
         } finally {
             lock.unlock();

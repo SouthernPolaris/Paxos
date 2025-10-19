@@ -1,0 +1,39 @@
+[Member M5] - Listening on port 9005
+[Proposer M5] Auto-proposing value: M5
+[Proposer M5] Starting proposal M5:1 with value 'M5'
+[Proposer M5] Sent Prepare for M5:1 to [M1, M2, M3, M4, M5, M6, M7, M8, M9]
+[Acceptor M5] Received Prepare(M5:1) from Proposer M5
+[Acceptor M5] Sent Promise for M5:1 to Proposer M5
+[Proposer M5] Received Promise for M5:1 from Acceptor M5
+[Proposer M5] Received Promise for M5:1 from Acceptor M9
+[Proposer M5] Received Promise for M5:1 from Acceptor M7
+[Proposer M5] Received Promise for M5:1 from Acceptor M8
+[Proposer M5] Received Promise for M5:1 from Acceptor M6
+[Proposer M5] Sent Accept Request for M5:1 with value 'M5'
+[Proposer M5] Received Promise for M5:1 from Acceptor M3
+[Proposer M5] Sent Accept Request for M5:1 with value 'M5'
+[Proposer M5] Received Promise for M5:1 from Acceptor M4
+[Proposer M5] Sent Accept Request for M5:1 with value 'M5'
+[Proposer M5] Received Promise for M5:1 from Acceptor M2
+[Proposer M5] Sent Accept Request for M5:1 with value 'M5'
+[Proposer M5] Received Promise for M5:1 from Acceptor M1
+[Proposer M5] Sent Accept Request for M5:1 with value 'M5'
+[Acceptor M5] Received AcceptRequest(M5:1, 'M5') from Proposer M5
+[Acceptor M5] Accepted proposal M5:1 with value 'M5'
+[Acceptor M5] Received AcceptRequest(M5:1, 'M5') from Proposer M5
+[Acceptor M5] Accepted proposal M5:1 with value 'M5'
+[Acceptor M5] Received AcceptRequest(M5:1, 'M5') from Proposer M5
+[Acceptor M5] Accepted proposal M5:1 with value 'M5'
+[Acceptor M5] Received AcceptRequest(M5:1, 'M5') from Proposer M5
+[Acceptor M5] Accepted proposal M5:1 with value 'M5'
+[Acceptor M5] Received AcceptRequest(M5:1, 'M5') from Proposer M5
+[Acceptor M5] Accepted proposal M5:1 with value 'M5'
+Learner M5 has learned the value: M5 for proposal number: M5:1
+Learner M5 has learned the value: M5 for proposal number: M5:1
+Learner M5 has learned the value: M5 for proposal number: M5:1
+Learner M5 has learned the value: M5 for proposal number: M5:1
+Learner M5 has learned the value: M5 for proposal number: M5:1
+Learner M5 has learned the value: M5 for proposal number: M5:1
+Learner M5 has learned the value: M5 for proposal number: M5:1
+Learner M5 has learned the value: M5 for proposal number: M5:1
+Learner M5 has learned the value: M5 for proposal number: M5:1

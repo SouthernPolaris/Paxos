@@ -1,0 +1,30 @@
+[Member M7] - Listening on port 9007
+[Acceptor M7] Received Prepare(M1:1) from Proposer M1
+[Acceptor M7] Sent Promise for M1:1 to Proposer M1
+[Acceptor M7] Received Prepare(M8:1) from Proposer M8
+[Acceptor M7] Sent Promise for M8:1 to Proposer M8
+[Acceptor M7] Received AcceptRequest(M1:1, 'M1') from Proposer M1
+[Acceptor M7] Ignored AcceptRequest(M1:1), promised number is M8:1
+[Acceptor M7] Received AcceptRequest(M1:1, 'M1') from Proposer M1
+[Acceptor M7] Ignored AcceptRequest(M1:1), promised number is M8:1
+[Acceptor M7] Received AcceptRequest(M1:1, 'M1') from Proposer M1
+[Acceptor M7] Ignored AcceptRequest(M1:1), promised number is M8:1
+[Acceptor M7] Received AcceptRequest(M1:1, 'M1') from Proposer M1
+[Acceptor M7] Ignored AcceptRequest(M1:1), promised number is M8:1
+[Acceptor M7] Received AcceptRequest(M1:1, 'M1') from Proposer M1
+[Acceptor M7] Ignored AcceptRequest(M1:1), promised number is M8:1
+[Acceptor M7] Received AcceptRequest(M8:1, 'M8') from Proposer M8
+[Acceptor M7] Accepted proposal M8:1 with value 'M8'
+[Acceptor M7] Received AcceptRequest(M8:1, 'M8') from Proposer M8
+[Acceptor M7] Accepted proposal M8:1 with value 'M8'
+[Acceptor M7] Received AcceptRequest(M8:1, 'M8') from Proposer M8
+[Acceptor M7] Accepted proposal M8:1 with value 'M8'
+[Acceptor M7] Received AcceptRequest(M8:1, 'M8') from Proposer M8
+[Acceptor M7] Accepted proposal M8:1 with value 'M8'
+[Acceptor M7] Received AcceptRequest(M8:1, 'M8') from Proposer M8
+[Acceptor M7] Accepted proposal M8:1 with value 'M8'
+Learner M7 has learned the value: M8 for proposal number: M8:1
+Learner M7 has learned the value: M8 for proposal number: M8:1
+Learner M7 has learned the value: M8 for proposal number: M8:1
+Learner M7 has learned the value: M8 for proposal number: M8:1
+Learner M7 has learned the value: M8 for proposal number: M8:1

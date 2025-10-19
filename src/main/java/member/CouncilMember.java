@@ -5,18 +5,26 @@ import paxos_logic.*;
 import paxos_util.*;
 
 import java.io.*;
-import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class CouncilMember {
     public static void main(String[] args) throws Exception {
-        if(args.length < 1) {
-            System.out.println("Usage: java CouncilMember <memberId>");
+        if (args.length < 1) {
+            System.out.println("Usage: java CouncilMember <memberId> [--propose <value>]");
             return;
         }
 
         String memberId = args[0];
+        String proposeValue = null;
+
+        // Parse optional --propose argument
+        for (int i = 1; i < args.length; i++) {
+            if (args[i].equalsIgnoreCase("--propose") && i + 1 < args.length) {
+                proposeValue = args[i + 1];
+                i++;
+            }
+        }
 
         // Load network.config
         Map<String, MemberConfig> allConfigs = loadNetworkConfig("conf/network.config");
@@ -27,13 +35,10 @@ public class CouncilMember {
         }
 
         MemberConfig myConfig = allConfigs.get(memberId);
-
         Set<String> acceptorIds = new HashSet<>(allConfigs.keySet());
-
-
         Set<String> learnerIds = new HashSet<>(acceptorIds);
 
-        // Create Paxos node first (no transport yet)
+        // Create Paxos node (transport is null for now)
         PaxosNode node = new PaxosNode(memberId, acceptorIds, learnerIds, null);
 
         // Create transport and link to node
@@ -41,7 +46,7 @@ public class CouncilMember {
             memberId,
             myConfig.port,
             allConfigs.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().address)),
+                    .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().address)),
             node,
             myConfig.profile
         );
@@ -50,19 +55,24 @@ public class CouncilMember {
             transport.setCrashAfterSend(true);
         }
 
-        // Now attach the transport back into the node
+        // Attach transport back to node
         node.setTransport(transport);
 
-        // Start listening (this was previously done inside PaxosNode constructor)
+        // Start listening immediately
         transport.startListening();
 
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("[Member " + memberId + "] Shutting down...");
+            transport.shutdown();
+        }));
 
-        // Optional: trigger proposal from console if not failure
-        if(myConfig.profile != Profile.FAILURE) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("Enter candidate to propose:");
-            String candidate = reader.readLine();
-            node.getProposer().propose(candidate);
+        // Small delay to ensure other members are up
+        Thread.sleep(2000);
+
+        // Auto-propose if value provided
+        if (proposeValue != null && myConfig.profile != Profile.FAILURE) {
+            System.out.println("[Proposer " + memberId + "] Auto-proposing value: " + proposeValue);
+            node.getProposer().propose(proposeValue);
         }
     }
 
@@ -71,6 +81,7 @@ public class CouncilMember {
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;
             while ((line = br.readLine()) != null) {
+                if (line.isBlank() || line.startsWith("#")) continue;
                 String[] parts = line.split(",");
                 String memberId = parts[0];
                 String host = parts[1];
