@@ -23,4 +23,18 @@ public class ProposalNumber implements Comparable<ProposalNumber> {
     public String toString() {
         return "M" + proposerId + ":" + sequence;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ProposalNumber)) return false;
+        ProposalNumber other = (ProposalNumber) obj;
+        return this.proposerId == other.proposerId && this.sequence == other.sequence;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * proposerId + sequence;
+    }
+
 }

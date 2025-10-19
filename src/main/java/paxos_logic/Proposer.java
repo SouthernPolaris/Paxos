@@ -166,14 +166,13 @@ public class Proposer {
     private void notifyLearners() {
         Accepted acceptedMsg = new Accepted(id, proposalNumber, proposalValue);
 
-        String acceptedJson = gson.toJson(acceptedMsg);
-
         System.out.println("[Proposer " + id + "] Notifying learners about chosen proposal " + proposalNumber + " with value '" + proposalValue + "'");
 
         for (String learnerId : acceptorIds) {
-            networkTransport.sendMessage(learnerId, acceptedJson);
+            networkTransport.sendMessage(learnerId, acceptedMsg);
         }
     }
+
 
     /**
      * Calculates the majority size based on total acceptors.

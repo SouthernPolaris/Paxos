@@ -53,8 +53,7 @@ public class Acceptor {
                     acceptedValue
                 );
 
-                String promiseJson = gson.toJson(promise);
-                networkTransport.sendMessage(String.valueOf(fromProposerId), promiseJson);
+                networkTransport.sendMessage(fromProposerId, promise);
                 System.out.println("[Acceptor " + memberId + "] Sent Promise for " + proposalNum + " to Proposer " + fromProposerId);
             } else {
                 System.out.println("[Acceptor " + memberId + "] Ignored Prepare(" + proposalNum + "), promised number is " + promisedNumber);
@@ -82,12 +81,11 @@ public class Acceptor {
                 Accepted acceptedMsg = new Accepted(memberId, proposalNum, acceptedValue);
 
                 // Reply to proposer
-                String acceptedJson = gson.toJson(acceptedMsg);
-                networkTransport.sendMessage(String.valueOf(fromProposerId), acceptedJson);
+                networkTransport.sendMessage(fromProposerId, acceptedMsg);
 
                 // Notify learners
                 for (String learnerId : learnerIds) {
-                    networkTransport.sendMessage(learnerId, acceptedJson);
+                    networkTransport.sendMessage(learnerId, acceptedMsg);
                 }
 
                 System.out.println("[Acceptor " + memberId + "] Accepted proposal " + proposalNum + " with value '" + acceptedValue + "'");
