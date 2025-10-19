@@ -1,0 +1,32 @@
+[Member M2] - Listening on port 9002
+[Member M2] Command port listening on 9102
+[Proposer M2] Received stdin proposal: {"type":"PROPOSE","value":"M6","from":"M2"}
+[Proposer M2] Starting proposal M2:1 with value '{"type":"PROPOSE","value":"M6","from":"M2"}'
+[Proposer M2] Sent Prepare for M2:1 to [M1, M2, M3, M4, M5, M6, M7, M8, M9]
+[Proposer M2] Received Promise for M2:1 from Acceptor M1
+[Proposer M2] Received Promise for M2:1 from Acceptor M4
+[Proposer M2] Received Promise for M2:1 from Acceptor M8
+[Proposer M2] Received Promise for M2:1 from Acceptor M5
+[Acceptor M2] Received Prepare(M2:1) from Proposer M2
+[Acceptor M2] Sent Promise for M2:1 to Proposer M2
+[Proposer M2] Received Promise for M2:1 from Acceptor M6
+[Proposer M2] Sent Accept Request for M2:1 with value '{"type":"PROPOSE","value":"M6","from":"M2"}'
+[Proposer M2] Received Promise for M2:1 from Acceptor M3
+[Proposer M2] Sent Accept Request for M2:1 with value '{"type":"PROPOSE","value":"M6","from":"M2"}'
+[Proposer M2] Received Promise for M2:1 from Acceptor M7
+[Proposer M2] Sent Accept Request for M2:1 with value '{"type":"PROPOSE","value":"M6","from":"M2"}'
+[Proposer M2] Received Promise for M2:1 from Acceptor M9
+[Proposer M2] Sent Accept Request for M2:1 with value '{"type":"PROPOSE","value":"M6","from":"M2"}'
+[Acceptor M2] Received AcceptRequest(M2:1, '{"type":"PROPOSE","value":"M6","from":"M2"}') from Proposer M2
+[Acceptor M2] Accepted proposal M2:1 with value '{"type":"PROPOSE","value":"M6","from":"M2"}'
+[Acceptor M2] Received AcceptRequest(M2:1, '{"type":"PROPOSE","value":"M6","from":"M2"}') from Proposer M2
+[Acceptor M2] Accepted proposal M2:1 with value '{"type":"PROPOSE","value":"M6","from":"M2"}'
+[Proposer M2] Received Promise for M2:1 from Acceptor M2
+[Proposer M2] Sent Accept Request for M2:1 with value '{"type":"PROPOSE","value":"M6","from":"M2"}'
+Learner M2 has learned the value: {"type":"PROPOSE","value":"M6","from":"M2"} for proposal number: M2:1
+[Acceptor M2] Received AcceptRequest(M2:1, '{"type":"PROPOSE","value":"M6","from":"M2"}') from Proposer M2
+[Acceptor M2] Accepted proposal M2:1 with value '{"type":"PROPOSE","value":"M6","from":"M2"}'
+[Member M2] Shutting down...
+Learner M2 has learned the value: {"type":"PROPOSE","value":"M6","from":"M2"} for proposal number: M2:1
+[Acceptor M2] Received AcceptRequest(M2:1, '{"type":"PROPOSE","value":"M6","from":"M2"}') from Proposer M2
+[Acceptor M2] Accepted proposal M2:1 with value '{"type":"PROPOSE","value":"M6","from":"M2"}'

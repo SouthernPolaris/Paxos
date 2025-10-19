@@ -5,6 +5,8 @@ import paxos_logic.*;
 import paxos_util.*;
 
 import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
@@ -42,7 +44,7 @@ public class CouncilMember {
         Set<String> acceptorIds = new HashSet<>(allConfigs.keySet());
         Set<String> learnerIds = new HashSet<>(acceptorIds);
 
-        // Create Paxos node (transport is null for now)
+        // Create Paxos node (transport null for now)
         PaxosNode node = new PaxosNode(memberId, acceptorIds, learnerIds, null);
 
         // Create transport and link to node
@@ -55,15 +57,14 @@ public class CouncilMember {
             myConfig.profile
         );
 
-        // If either profile indicates failure or command-line flag given, enable crash-after-send
+        // Enable crash-after-send if applicable
         if (crashAfterSend || myConfig.profile == Profile.FAILURE) {
             transport.setCrashAfterSend(true);
         }
 
-        // Attach transport back to node
         node.setTransport(transport);
 
-        // Start listening immediately
+        // Start Paxos listening
         transport.startListening();
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -71,17 +72,16 @@ public class CouncilMember {
             transport.shutdown();
         }));
 
-        // Small delay to ensure other members are up (script will also wait_for_listening)
+        // Small startup delay to ensure all nodes are ready
         Thread.sleep(2000);
 
-        // If a --propose was provided on the command line, propose it now (we allow proposals even for FAILURE profile)
+        // Auto-propose if --propose given
         if (proposeValue != null) {
             System.out.println("[Proposer " + memberId + "] Auto-proposing value: " + proposeValue);
             node.getProposer().propose(proposeValue);
-            // node.startAutoRetryProposal(proposeValue, 2, 5);
         }
 
-        // Start a background thread that reads proposals from stdin (one per line) and proposes them.
+        // Background thread for stdin proposals (optional)
         Thread stdinReader = new Thread(() -> {
             try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
                 String line;
@@ -89,12 +89,7 @@ public class CouncilMember {
                     line = line.trim();
                     if (!line.isEmpty()) {
                         System.out.println("[Proposer " + memberId + "] Received stdin proposal: " + line);
-                        try {
-                            node.getProposer().propose(line);
-                        } catch (Exception e) {
-                            System.err.println("[Proposer " + memberId + "] Error while proposing: " + e.getMessage());
-                            e.printStackTrace();
-                        }
+                        node.getProposer().propose(line);
                     }
                 }
             } catch (IOException ioe) {
@@ -104,12 +99,36 @@ public class CouncilMember {
         stdinReader.setDaemon(true);
         stdinReader.start();
 
-        // Keep the process alive so this member continues to listen and participate
+        // --- TCP Command Port Listener for runtime proposals ---
+        int commandPort = myConfig.port + 100;
+        Thread commandServer = new Thread(() -> {
+            try (ServerSocket serverSocket = new ServerSocket(commandPort)) {
+                System.out.println("[Member " + memberId + "] Command port listening on " + commandPort);
+                while (true) {
+                    try (Socket client = serverSocket.accept();
+                         BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()))) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            line = line.trim();
+                            if (!line.isEmpty()) {
+                                System.out.println("[Proposer " + memberId + "] Received command proposal: " + line);
+                                node.getProposer().propose(line);
+                            }
+                        }
+                    } catch (IOException e) {
+                        System.err.println("[Member " + memberId + "] Command connection error: " + e.getMessage());
+                    }
+                }
+            } catch (IOException e) {
+                System.err.println("[Member " + memberId + "] Failed to start command server: " + e.getMessage());
+            }
+        });
+        commandServer.setDaemon(true);
+        commandServer.start();
+
+        // Keep process alive
         CountDownLatch latch = new CountDownLatch(1);
-        try {
-            latch.await();
-        } catch (InterruptedException ignored) {
-        }
+        latch.await();
     }
 
     private static Map<String, MemberConfig> loadNetworkConfig(String path) throws IOException {
