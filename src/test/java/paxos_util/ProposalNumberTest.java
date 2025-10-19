@@ -50,8 +50,12 @@ public class ProposalNumberTest {
         assertEquals(pn1, pn2);
         assertEquals(pn2, pn1);
 
-        assertNotEquals(pn1, pn3); // Different sequence
-        assertNotEquals(pn1, pn4); // Different proposer ID
+        // Different sequence
+        assertNotEquals(pn1, pn3);
+
+        // Different proposer ID
+        assertNotEquals(pn1, pn4);
+        
         assertNotEquals(pn1, null);
         assertNotEquals(pn1, "not a ProposalNumber");
     }

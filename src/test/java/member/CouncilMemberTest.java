@@ -22,7 +22,6 @@ public class CouncilMemberTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        // Create a temporary config file
         configFile = tempDir.resolve("network.config");
         String configContent = """
             M1,localhost,9001,RELIABLE
@@ -66,18 +65,17 @@ public class CouncilMemberTest {
 
     @Test
     public void testMemberIdNotInConfig() throws Exception {
-        // Create config directory structure
         Path confDir = tempDir.resolve("conf");
         Files.createDirectories(confDir);
         Path networkConfig = confDir.resolve("network.config");
         Files.write(networkConfig, "M1,localhost,9001,RELIABLE\n".getBytes());
         
-        // Set system property to use our temp directory as working directory
         String originalUserDir = System.getProperty("user.dir");
         try {
             System.setProperty("user.dir", tempDir.toString());
             
-            String[] args = {"M999"}; // Non-existent member
+            // Invalid member
+            String[] args = {"M999"};
             
             CouncilMember.main(args);
             
@@ -90,23 +88,19 @@ public class CouncilMemberTest {
 
     @Test
     public void testProfileEnumHandling() {
-        // Test all valid Profile enum values
         for (Profile profile : Profile.values()) {
             assertNotNull(profile);
             assertNotNull(profile.name());
             
-            // Test string conversion
             Profile parsed = Profile.valueOf(profile.name());
             assertEquals(profile, parsed);
         }
         
-        // Test case sensitivity
         assertEquals(Profile.RELIABLE, Profile.valueOf("RELIABLE"));
         assertEquals(Profile.LATENT, Profile.valueOf("LATENT"));
         assertEquals(Profile.FAILURE, Profile.valueOf("FAILURE"));
         assertEquals(Profile.STANDARD, Profile.valueOf("STANDARD"));
         
-        // Test invalid profile
         assertThrows(IllegalArgumentException.class, () -> {
             Profile.valueOf("INVALID");
         });
@@ -126,7 +120,6 @@ public class CouncilMemberTest {
         Path testConfig = tempDir.resolve("blanks.config");
         Files.write(testConfig, configWithBlanks.getBytes());
         
-        // File should exist and parsing should handle blank lines gracefully
         assertTrue(Files.exists(testConfig));
         String content = Files.readString(testConfig);
         assertTrue(content.contains("M1,localhost,9001,RELIABLE"));

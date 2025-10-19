@@ -38,11 +38,9 @@ public class MemberConfigTest {
     public void testAddressConsistency() {
         MemberConfig config = new MemberConfig("localhost", 9001, Profile.RELIABLE);
         
-        // The same parameters should create equivalent addresses
         InetSocketAddress manualAddress = new InetSocketAddress("localhost", 9001);
         assertEquals(manualAddress, config.address);
         
-        // Port should be consistent between fields
         assertEquals(config.port, config.address.getPort());
     }
 }

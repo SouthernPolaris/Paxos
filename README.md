@@ -73,7 +73,7 @@ The config files are structured as a CSV-style file. Each line represents a node
 
 Each line contains:
 ```
-Name,hostname,port,RELIABILITY_TYPE
+Name,address,port,RELIABILITY_TYPE
 ```
 
 Adjust the config files in `conf/` as required by your test scenarios.

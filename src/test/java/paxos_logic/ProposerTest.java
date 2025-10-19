@@ -100,7 +100,7 @@ public class ProposerTest {
         proposer.handlePromise(new Promise("M2", pn, higherAccepted.toString(), higherValue));
         
         reset(mockTransport);
-        proposer.handlePromise(new Promise("M3", pn, null, null)); // Trigger majority
+        proposer.handlePromise(new Promise("M3", pn, null, null));
         
         verify(mockTransport, atLeastOnce()).sendMessage(any(), argThat(msg -> {
             if (msg instanceof AcceptRequest acceptRequest) {
@@ -167,7 +167,7 @@ public class ProposerTest {
         assertTrue(output.contains("Starting proposal M1:1 with value 'value1'"));
         assertTrue(output.contains("Starting proposal M1:2 with value 'value2'"));
         
-        verify(mockTransport, atLeast(10)).sendMessage(any(), any(Prepare.class)); // 5 acceptors × 2 proposals
+        verify(mockTransport, atLeast(10)).sendMessage(any(), any(Prepare.class));
     }
 
     @Test
@@ -188,7 +188,7 @@ public class ProposerTest {
             thread.join();
         }
 
-        verify(mockTransport, atLeast(25)).sendMessage(any(), any(Prepare.class)); // 5 acceptors × 5 proposals
+        verify(mockTransport, atLeast(25)).sendMessage(any(), any(Prepare.class));
     }
 
     @Test
@@ -198,13 +198,15 @@ public class ProposerTest {
         ProposalNumber pn = new ProposalNumber("M1:1");
         
         proposer.handlePromise(new Promise("M1", pn, null, null));
-        proposer.handlePromise(new Promise("M1", pn, null, null)); // Duplicate
+        // Duplicate
+        proposer.handlePromise(new Promise("M1", pn, null, null));
         proposer.handlePromise(new Promise("M2", pn, null, null));
         
         reset(mockTransport);
         verify(mockTransport, never()).sendMessage(any(), any(AcceptRequest.class));
         
-        proposer.handlePromise(new Promise("M3", pn, null, null)); // Third unique promise
+        // Third unique promise
+        proposer.handlePromise(new Promise("M3", pn, null, null)); 
         
         verify(mockTransport, atLeastOnce()).sendMessage(any(), any(AcceptRequest.class));
     }
