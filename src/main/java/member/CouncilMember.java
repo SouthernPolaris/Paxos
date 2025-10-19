@@ -6,6 +6,7 @@ import paxos_util.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
 public class CouncilMember {
@@ -73,6 +74,14 @@ public class CouncilMember {
         if (proposeValue != null && myConfig.profile != Profile.FAILURE) {
             System.out.println("[Proposer " + memberId + "] Auto-proposing value: " + proposeValue);
             node.getProposer().propose(proposeValue);
+        }
+
+        // Keep the process alive so this member continues to listen and participate
+        // (previous behavior exited after proposing which caused other nodes to see ConnectionRefused)
+        CountDownLatch latch = new CountDownLatch(1);
+        try {
+            latch.await();
+        } catch (InterruptedException ignored) {
         }
     }
 

@@ -17,14 +17,12 @@
 [Acceptor M9] Ignored AcceptRequest(M1:1), promised number is M8:1
 [Acceptor M9] Received AcceptRequest(M8:1, 'M8') from Proposer M8
 [Acceptor M9] Accepted proposal M8:1 with value 'M8'
+Learner M9 has learned the value: M8 for proposal number: M8:1
 [Acceptor M9] Received AcceptRequest(M8:1, 'M8') from Proposer M8
 [Acceptor M9] Accepted proposal M8:1 with value 'M8'
+Learner M9 has learned the value: M8 for proposal number: M8:1
+Learner M9 has learned the value: M8 for proposal number: M8:1
 [Acceptor M9] Received AcceptRequest(M8:1, 'M8') from Proposer M8
 [Acceptor M9] Accepted proposal M8:1 with value 'M8'
-[Acceptor M9] Received AcceptRequest(M8:1, 'M8') from Proposer M8
 Learner M9 has learned the value: M8 for proposal number: M8:1
-[Acceptor M9] Accepted proposal M8:1 with value 'M8'
-Learner M9 has learned the value: M8 for proposal number: M8:1
-Learner M9 has learned the value: M8 for proposal number: M8:1
-Learner M9 has learned the value: M8 for proposal number: M8:1
-Learner M9 has learned the value: M8 for proposal number: M8:1
+[Member M9] Shutting down...

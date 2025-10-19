@@ -1,0 +1,18 @@
+[Member M9] - Listening on port 9009
+[Acceptor M9] Received Prepare(M4:1) from Proposer M4
+[Acceptor M9] Sent Promise for M4:1 to Proposer M4
+[Acceptor M9] Received AcceptRequest(M4:1, 'M5') from Proposer M4
+[Acceptor M9] Accepted proposal M4:1 with value 'M5'
+[Acceptor M9] Received AcceptRequest(M4:1, 'M5') from Proposer M4
+[Acceptor M9] Accepted proposal M4:1 with value 'M5'
+[Acceptor M9] Received AcceptRequest(M4:1, 'M5') from Proposer M4
+[Acceptor M9] Accepted proposal M4:1 with value 'M5'
+Learner M9 has learned the value: M5 for proposal number: M4:1
+[Acceptor M9] Received AcceptRequest(M4:1, 'M5') from Proposer M4
+[Acceptor M9] Accepted proposal M4:1 with value 'M5'
+Learner M9 has learned the value: M5 for proposal number: M4:1
+[Acceptor M9] Received AcceptRequest(M4:1, 'M5') from Proposer M4
+[Acceptor M9] Accepted proposal M4:1 with value 'M5'
+Learner M9 has learned the value: M5 for proposal number: M4:1
+Learner M9 has learned the value: M5 for proposal number: M4:1
+[Member M9] Shutting down...

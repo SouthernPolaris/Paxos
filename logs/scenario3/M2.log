@@ -1,0 +1,7 @@
+[Member M2] - Listening on port 9002
+[Acceptor M2] Received Prepare(M4:1) from Proposer M4
+[Acceptor M2] Sent Promise for M4:1 to Proposer M4
+[Member M2] Shutting down...
+[Acceptor M2] Received AcceptRequest(M4:1, 'M7') from Proposer M4
+[Acceptor M2] Accepted proposal M4:1 with value 'M7'
+Learner M2 has learned the value: M7 for proposal number: M4:1

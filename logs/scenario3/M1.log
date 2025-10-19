@@ -1,0 +1,19 @@
+[Member M1] - Listening on port 9001
+[Acceptor M1] Received Prepare(M4:1) from Proposer M4
+[Acceptor M1] Sent Promise for M4:1 to Proposer M4
+[Acceptor M1] Received AcceptRequest(M4:1, 'M7') from Proposer M4
+[Acceptor M1] Accepted proposal M4:1 with value 'M7'
+[Acceptor M1] Received AcceptRequest(M4:1, 'M7') from Proposer M4
+[Acceptor M1] Accepted proposal M4:1 with value 'M7'
+[Acceptor M1] Received AcceptRequest(M4:1, 'M7') from Proposer M4
+[Acceptor M1] Accepted proposal M4:1 with value 'M7'
+Learner M1 has learned the value: M7 for proposal number: M4:1
+[Acceptor M1] Received AcceptRequest(M4:1, 'M7') from Proposer M4
+[Acceptor M1] Accepted proposal M4:1 with value 'M7'
+Learner M1 has learned the value: M7 for proposal number: M4:1
+[Member M1] Shutting down...
+Learner M1 has learned the value: M7 for proposal number: M4:1
+[Acceptor M1] Received AcceptRequest(M4:1, 'M7') from Proposer M4
+[Acceptor M1] Accepted proposal M4:1 with value 'M7'
+Learner M1 has learned the value: M7 for proposal number: M4:1
+Learner M1 has learned the value: M7 for proposal number: M4:1
