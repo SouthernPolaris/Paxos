@@ -11,18 +11,17 @@
 [Acceptor M5] Ignored AcceptRequest(M1:1), promised number is M8:1
 [Acceptor M5] Received AcceptRequest(M1:1, 'M1') from Proposer M1
 [Acceptor M5] Ignored AcceptRequest(M1:1), promised number is M8:1
-[Acceptor M5] Received AcceptRequest(M8:1, 'M8') from Proposer M8
-[Acceptor M5] Accepted proposal M8:1 with value 'M8'
-[Acceptor M5] Received AcceptRequest(M8:1, 'M8') from Proposer M8
-[Acceptor M5] Accepted proposal M8:1 with value 'M8'
-[Acceptor M5] Received AcceptRequest(M1:1, 'M1') from Proposer M1
-[Acceptor M5] Ignored AcceptRequest(M1:1), promised number is M8:1
-[Acceptor M5] Received AcceptRequest(M8:1, 'M8') from Proposer M8
-[Acceptor M5] Accepted proposal M8:1 with value 'M8'
-Learner M5 has learned the value: M8 for proposal number: M8:1
-Learner M5 has learned the value: M8 for proposal number: M8:1
-[Acceptor M5] Received AcceptRequest(M8:1, 'M8') from Proposer M8
-[Acceptor M5] Accepted proposal M8:1 with value 'M8'
-Learner M5 has learned the value: M8 for proposal number: M8:1
-Learner M5 has learned the value: M8 for proposal number: M8:1
+[Acceptor M5] Received AcceptRequest(M8:1, 'M1') from Proposer M8
+[Acceptor M5] Accepted proposal M8:1 with value 'M1'
+[Acceptor M5] Received AcceptRequest(M8:1, 'M1') from Proposer M8
+[Acceptor M5] Accepted proposal M8:1 with value 'M1'
+[Acceptor M5] Received AcceptRequest(M8:1, 'M1') from Proposer M8
+[Acceptor M5] Accepted proposal M8:1 with value 'M1'
+Learner M5 has learned the value: M1 for proposal number: M8:1
+Learner M5 has learned the value: M1 for proposal number: M8:1
+Learner M5 has learned the value: M1 for proposal number: M8:1
+[Acceptor M5] Received AcceptRequest(M8:1, 'M1') from Proposer M8
+[Acceptor M5] Accepted proposal M8:1 with value 'M1'
+Learner M5 has learned the value: M1 for proposal number: M8:1
+Learner M5 has learned the value: M1 for proposal number: M8:1
 [Member M5] Shutting down...

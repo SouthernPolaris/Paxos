@@ -12,18 +12,21 @@ import java.util.stream.Collectors;
 public class CouncilMember {
     public static void main(String[] args) throws Exception {
         if (args.length < 1) {
-            System.out.println("Usage: java CouncilMember <memberId> [--propose <value>]");
+            System.out.println("Usage: java CouncilMember <memberId> [--propose <value>] [--crashAfterSend]");
             return;
         }
 
         String memberId = args[0];
         String proposeValue = null;
+        boolean crashAfterSend = false;
 
-        // Parse optional --propose argument
+        // Parse optional arguments
         for (int i = 1; i < args.length; i++) {
             if (args[i].equalsIgnoreCase("--propose") && i + 1 < args.length) {
                 proposeValue = args[i + 1];
                 i++;
+            } else if (args[i].equalsIgnoreCase("--crashAfterSend")) {
+                crashAfterSend = true;
             }
         }
 
@@ -52,7 +55,8 @@ public class CouncilMember {
             myConfig.profile
         );
 
-        if (myConfig.profile == Profile.FAILURE) {
+        // If either profile indicates failure or command-line flag given, enable crash-after-send
+        if (crashAfterSend || myConfig.profile == Profile.FAILURE) {
             transport.setCrashAfterSend(true);
         }
 
@@ -67,17 +71,39 @@ public class CouncilMember {
             transport.shutdown();
         }));
 
-        // Small delay to ensure other members are up
+        // Small delay to ensure other members are up (script will also wait_for_listening)
         Thread.sleep(2000);
 
-        // Auto-propose if value provided
-        if (proposeValue != null && myConfig.profile != Profile.FAILURE) {
+        // If a --propose was provided on the command line, propose it now (we allow proposals even for FAILURE profile)
+        if (proposeValue != null) {
             System.out.println("[Proposer " + memberId + "] Auto-proposing value: " + proposeValue);
             node.getProposer().propose(proposeValue);
         }
 
+        // Start a background thread that reads proposals from stdin (one per line) and proposes them.
+        Thread stdinReader = new Thread(() -> {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    line = line.trim();
+                    if (!line.isEmpty()) {
+                        System.out.println("[Proposer " + memberId + "] Received stdin proposal: " + line);
+                        try {
+                            node.getProposer().propose(line);
+                        } catch (Exception e) {
+                            System.err.println("[Proposer " + memberId + "] Error while proposing: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            } catch (IOException ioe) {
+                System.err.println("[Proposer " + memberId + "] Stdin reader closed: " + ioe.getMessage());
+            }
+        });
+        stdinReader.setDaemon(true);
+        stdinReader.start();
+
         // Keep the process alive so this member continues to listen and participate
-        // (previous behavior exited after proposing which caused other nodes to see ConnectionRefused)
         CountDownLatch latch = new CountDownLatch(1);
         try {
             latch.await();

@@ -2,9 +2,11 @@
 [Proposer M8] Auto-proposing value: M8
 [Proposer M8] Starting proposal M8:1 with value 'M8'
 [Proposer M8] Sent Prepare for M8:1 to [M1, M2, M3, M4, M5, M6, M7, M8, M9]
-[Proposer M8] Received Promise for M8:1 from Acceptor M1
 [Acceptor M8] Received Prepare(M1:1) from Proposer M1
 [Acceptor M8] Sent Promise for M1:1 to Proposer M1
+[Proposer M8] Received Promise for M8:1 from Acceptor M1
+[Acceptor M8] Received AcceptRequest(M1:1, 'M1') from Proposer M1
+[Acceptor M8] Accepted proposal M1:1 with value 'M1'
 [Acceptor M8] Received Prepare(M8:1) from Proposer M8
 [Acceptor M8] Sent Promise for M8:1 to Proposer M8
 [Proposer M8] Received Promise for M8:1 from Acceptor M9
@@ -12,37 +14,37 @@
 [Acceptor M8] Ignored AcceptRequest(M1:1), promised number is M8:1
 [Acceptor M8] Received AcceptRequest(M1:1, 'M1') from Proposer M1
 [Acceptor M8] Ignored AcceptRequest(M1:1), promised number is M8:1
-[Proposer M8] Received Promise for M8:1 from Acceptor M5
-[Proposer M8] Received Promise for M8:1 from Acceptor M8
-[Acceptor M8] Received AcceptRequest(M1:1, 'M1') from Proposer M1
-[Acceptor M8] Ignored AcceptRequest(M1:1), promised number is M8:1
-[Acceptor M8] Received AcceptRequest(M1:1, 'M1') from Proposer M1
-[Acceptor M8] Ignored AcceptRequest(M1:1), promised number is M8:1
-[Proposer M8] Received Promise for M8:1 from Acceptor M6
-[Proposer M8] Sent Accept Request for M8:1 with value 'M8'
 [Proposer M8] Received Promise for M8:1 from Acceptor M7
-[Proposer M8] Sent Accept Request for M8:1 with value 'M8'
-[Proposer M8] Received Promise for M8:1 from Acceptor M4
-[Proposer M8] Sent Accept Request for M8:1 with value 'M8'
-[Acceptor M8] Received AcceptRequest(M8:1, 'M8') from Proposer M8
-[Acceptor M8] Accepted proposal M8:1 with value 'M8'
+[Proposer M8] Updated proposal value to 'M1' based on prior accepted proposal
 [Acceptor M8] Received AcceptRequest(M1:1, 'M1') from Proposer M1
 [Acceptor M8] Ignored AcceptRequest(M1:1), promised number is M8:1
-Learner M8 has learned the value: M8 for proposal number: M8:1
-[Acceptor M8] Received AcceptRequest(M8:1, 'M8') from Proposer M8
-[Acceptor M8] Accepted proposal M8:1 with value 'M8'
-[Acceptor M8] Received AcceptRequest(M8:1, 'M8') from Proposer M8
-[Acceptor M8] Accepted proposal M8:1 with value 'M8'
-Learner M8 has learned the value: M8 for proposal number: M8:1
-Learner M8 has learned the value: M8 for proposal number: M8:1
+[Proposer M8] Received Promise for M8:1 from Acceptor M5
+[Proposer M8] Updated proposal value to 'M1' based on prior accepted proposal
+[Proposer M8] Received Promise for M8:1 from Acceptor M4
+[Proposer M8] Updated proposal value to 'M1' based on prior accepted proposal
+[Proposer M8] Sent Accept Request for M8:1 with value 'M1'
+[Proposer M8] Received Promise for M8:1 from Acceptor M6
+[Proposer M8] Updated proposal value to 'M1' based on prior accepted proposal
+[Proposer M8] Sent Accept Request for M8:1 with value 'M1'
+[Proposer M8] Received Promise for M8:1 from Acceptor M8
+[Proposer M8] Updated proposal value to 'M1' based on prior accepted proposal
+[Proposer M8] Sent Accept Request for M8:1 with value 'M1'
+[Acceptor M8] Received AcceptRequest(M8:1, 'M1') from Proposer M8
+[Acceptor M8] Accepted proposal M8:1 with value 'M1'
+[Acceptor M8] Received AcceptRequest(M8:1, 'M1') from Proposer M8
+[Acceptor M8] Accepted proposal M8:1 with value 'M1'
+[Acceptor M8] Received AcceptRequest(M8:1, 'M1') from Proposer M8
+[Acceptor M8] Accepted proposal M8:1 with value 'M1'
 [Proposer M8] Received Promise for M8:1 from Acceptor M2
-[Proposer M8] Sent Accept Request for M8:1 with value 'M8'
-Learner M8 has learned the value: M8 for proposal number: M8:1
-Learner M8 has learned the value: M8 for proposal number: M8:1
-[Acceptor M8] Received AcceptRequest(M8:1, 'M8') from Proposer M8
-[Acceptor M8] Accepted proposal M8:1 with value 'M8'
-Learner M8 has learned the value: M8 for proposal number: M8:1
-Learner M8 has learned the value: M8 for proposal number: M8:1
-Learner M8 has learned the value: M8 for proposal number: M8:1
-Learner M8 has learned the value: M8 for proposal number: M8:1
+[Proposer M8] Updated proposal value to 'M1' based on prior accepted proposal
+[Proposer M8] Sent Accept Request for M8:1 with value 'M1'
+Learner M8 has learned the value: M1 for proposal number: M8:1
+Learner M8 has learned the value: M1 for proposal number: M8:1
+Learner M8 has learned the value: M1 for proposal number: M8:1
+Learner M8 has learned the value: M1 for proposal number: M8:1
+Learner M8 has learned the value: M1 for proposal number: M8:1
+Learner M8 has learned the value: M1 for proposal number: M8:1
+[Acceptor M8] Received AcceptRequest(M8:1, 'M1') from Proposer M8
+[Acceptor M8] Accepted proposal M8:1 with value 'M1'
+Learner M8 has learned the value: M1 for proposal number: M8:1
 [Member M8] Shutting down...
