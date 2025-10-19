@@ -1,7 +1,6 @@
 package member;
 
 import java.net.InetSocketAddress;
-import member.Profile;
 
 public class MemberConfig {
     public final InetSocketAddress address;

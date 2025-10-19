@@ -133,4 +133,8 @@ public class PaxosNode {
         this.proposer.setTransport(transport);
     }
 
+    public MemberTransport getTransport() {
+        return this.memberTransport;
+    }
+
 }

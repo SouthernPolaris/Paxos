@@ -33,9 +33,7 @@ public class ProposalNumber implements Comparable<ProposalNumber> {
     }
 
     @Override
-    // TODO: Double check if necessary
     public int hashCode() {
         return 31 * proposerId + sequence;
     }
-
 }

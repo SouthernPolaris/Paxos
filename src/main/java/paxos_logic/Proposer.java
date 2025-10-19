@@ -4,9 +4,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import network.MemberTransport;
 import paxos_util.*;
 
@@ -21,8 +18,6 @@ public class Proposer {
     
     private MemberTransport networkTransport;
     private final ReentrantLock lock = new ReentrantLock();
-    
-    private final Gson gson = new GsonBuilder().create();
 
     private ProposalNumber proposalNumber;
     private String proposalValue;

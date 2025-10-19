@@ -2,7 +2,6 @@ package member;
 
 import network.*;
 import paxos_logic.*;
-import paxos_util.*;
 
 import java.io.*;
 import java.net.ServerSocket;

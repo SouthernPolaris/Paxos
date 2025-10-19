@@ -3,9 +3,6 @@ package paxos_logic;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import network.MemberTransport;
 import paxos_util.*;
 
@@ -24,8 +21,6 @@ public class Acceptor {
     private ProposalNumber promisedNumber = null;
     private ProposalNumber acceptedNumber = null;
     private String acceptedValue = null;
-
-    private final Gson gson = new GsonBuilder().create();
 
     public Acceptor(String memberId, MemberTransport networkTransport, Set<String> learnerIds) {
         this.memberId = memberId;
