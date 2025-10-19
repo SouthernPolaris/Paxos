@@ -5,13 +5,11 @@
 [Acceptor M5] Accepted proposal M4:1 with value 'M7'
 [Acceptor M5] Received AcceptRequest(M4:1, 'M7') from Proposer M4
 [Acceptor M5] Accepted proposal M4:1 with value 'M7'
+[Acceptor M5] Received AcceptRequest(M4:1, 'M7') from Proposer M4
+[Acceptor M5] Accepted proposal M4:1 with value 'M7'
+[Acceptor M5] Received AcceptRequest(M4:1, 'M7') from Proposer M4
+[Acceptor M5] Accepted proposal M4:1 with value 'M7'
+Learner M5 has learned the value: M7 for proposal number: M4:1
 [Member M5] Shutting down...
 Learner M5 has learned the value: M7 for proposal number: M4:1
-[Acceptor M5] Received AcceptRequest(M4:1, 'M7') from Proposer M4
-[Acceptor M5] Accepted proposal M4:1 with value 'M7'
-[Acceptor M5] Received AcceptRequest(M4:1, 'M7') from Proposer M4
-[Acceptor M5] Accepted proposal M4:1 with value 'M7'
-Learner M5 has learned the value: M7 for proposal number: M4:1
-[Acceptor M5] Received AcceptRequest(M4:1, 'M7') from Proposer M4
-[Acceptor M5] Accepted proposal M4:1 with value 'M7'
 Learner M5 has learned the value: M7 for proposal number: M4:1

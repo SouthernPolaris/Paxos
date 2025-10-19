@@ -99,23 +99,45 @@ sleep 7
 wait_for_consensus M6 60 || echo "[3b] FAIL"
 cleanup
 
+
 # ---------- Subtest 3c ----------
 cleanup
-echo "[3c] Starting all members; M3 failing will crash, M4 drives M7"
+echo "[3c] Running staged start: baseline members, then M3 (crash), then M4 drives M7"
+
+# Start baseline members except M3 and M4
 for i in "${!MEMBERS[@]}"; do
     M=${MEMBERS[$i]}
+    if [[ "$M" == "M3" || "$M" == "M4" ]]; then
+        continue
+    fi
     PROFILE=STANDARD
     [[ "$M" == "M1" ]] && PROFILE=RELIABLE
     [[ "$M" == "M2" ]] && PROFILE=LATENT
-    [[ "$M" == "M3" ]] && PROFILE=FAILURE
-    EXTRA=""
-    [[ "$M" == "M3" ]] && EXTRA="--propose M3 --crashAfterSend"
-    [[ "$M" == "M4" ]] && EXTRA="--propose M7"
-    start_member "$M" "$PROFILE" "$EXTRA"
+    start_member "$M" "$PROFILE"
 done
 
-# Give system time to handle M3 crash and M4 proposal
-sleep 8
+# Start M3 (failing) with auto-propose+crash
+start_member "M3" FAILURE "--propose M3 --crashAfterSend"
+
+# Wait until M3 actually exits (max 20s)
+M3_PID=$(pgrep -f "member.CouncilMember.*M3")
+echo "[3c] Waiting for M3 to exit after crash..."
+START=$(date +%s)
+while kill -0 "$M3_PID" >/dev/null 2>&1; do
+    sleep 0.2
+    NOW=$(date +%s)
+    if (( NOW - START > 20 )); then
+        echo "[3c] warning: M3 still running after 20s; proceeding to start M4 anyway"
+        break
+    fi
+done
+
+# Now start M4 to drive consensus
+start_member "M4" STANDARD "--propose M7"
+
+
+# Give system time and wait for consensus
+sleep 1
 wait_for_consensus M7 60 || echo "[3c] FAIL"
 cleanup
 
