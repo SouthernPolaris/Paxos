@@ -409,7 +409,7 @@ run_subtest() {
             echo "[3b] FAIL"
         fi
 
-        else
+    else
         echo "[3c] Failing member (M3) proposes then crashes, M4 drives M7 (M3 will be excluded from final check)"
         for i in "${!MEMBERS[@]}"; do
             MEMBER=${MEMBERS[$i]}
@@ -434,21 +434,46 @@ run_subtest() {
         echo "[3c] Waiting up to 20s for M3 (port $m3_port) to stop..."
         timeout=20
         start_time=$(date +%s)
+
+        m3_port=$(grep "^M3," "$CONFIG_FILE" | cut -d',' -f3)
+        echo "[3c] Waiting up to ${timeout}s for M3 (port $m3_port) to stop or log shutdown..."
+        start_time=$(date +%s)
+        stopped=0
         while true; do
             pid=$(lsof -ti tcp:"$m3_port" || true)
-            if [ -z "$pid" ]; then
-                echo "[3c] M3 appears to have stopped listening."
-                break
-            fi
-            if (( $(date +%s) - start_time > timeout )); then
-                echo "[3c] M3 did not stop in ${timeout}s; force killing PID(s): $pid"
-                if [ -n "$pid" ]; then
-                    kill -9 $pid || true
+
+            # check M3 log for explicit shutdown message
+            shutdown_logged=0
+            if [ -f "$TEST_DIR/M3.log" ]; then
+                if grep -qi "Shutting down" "$TEST_DIR/M3.log" 2>/dev/null; then
+                    shutdown_logged=1
                 fi
+            fi
+
+            if [ -z "$pid" ] || [ "$shutdown_logged" -eq 1 ]; then
+                if [ "$shutdown_logged" -eq 1 ]; then
+                    echo "[3c] M3 log indicates shutdown."
+                else
+                    echo "[3c] M3 port $m3_port is no longer open (no process listening)."
+                fi
+                stopped=1
                 break
             fi
+
+            if (( $(date +%s) - start_time > timeout )); then
+                echo "[3c] M3 did not report shutdown within ${timeout}s; proceeding without killing."
+                stopped=0
+                break
+            fi
+
             sleep 0.5
         done
+
+        if [ "$stopped" -eq 1 ]; then
+            echo "[3c] Confirmed M3 has stopped."
+        else
+            echo "[3c] M3 still appears running (or did not log shutdown) after ${timeout}s."
+        fi
 
         sleep 1
 
@@ -469,8 +494,8 @@ run_subtest() {
     cleanup_fifos
 }
 
-# run_subtest "a"
-# run_subtest "b"
+run_subtest "a"
+run_subtest "b"
 run_subtest "c"
 
 echo "[done] Scenario 3 subtests completed. Logs in $LOG_ROOT (subdirs a, b, c)"
