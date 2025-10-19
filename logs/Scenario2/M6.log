@@ -1,0 +1,23 @@
+[Member M6] - Listening on port 9006
+[Member M6] Command port listening on 9106
+[Acceptor M6] Received Prepare(M8:1) from Proposer M8
+[Acceptor M6] Sent Promise for M8:1 to Proposer M8
+[Acceptor M6] Received Prepare(M1:1) from Proposer M1
+[Acceptor M6] Ignored Prepare(M1:1), promised number is M8:1
+[Acceptor M6] Received AcceptRequest(M8:1, 'M8') from Proposer M8
+[Acceptor M6] Accepted proposal M8:1 with value 'M8'
+[Acceptor M6] Received AcceptRequest(M8:1, 'M8') from Proposer M8
+Learner M6 has learned the value: M8 for proposal number: M8:1
+[Acceptor M6] Accepted proposal M8:1 with value 'M8'
+[Acceptor M6] Received AcceptRequest(M8:1, 'M8') from Proposer M8
+[Acceptor M6] Accepted proposal M8:1 with value 'M8'
+[Acceptor M6] Received AcceptRequest(M8:1, 'M8') from Proposer M8
+Learner M6 has learned the value: M8 for proposal number: M8:1
+Learner M6 has learned the value: M8 for proposal number: M8:1
+Learner M6 has learned the value: M8 for proposal number: M8:1
+Learner M6 has learned the value: M8 for proposal number: M8:1
+[Acceptor M6] Accepted proposal M8:1 with value 'M8'
+[Acceptor M6] Received AcceptRequest(M8:1, 'M8') from Proposer M8
+[Acceptor M6] Accepted proposal M8:1 with value 'M8'
+Learner M6 has learned the value: M8 for proposal number: M8:1
+[Member M6] Shutting down...

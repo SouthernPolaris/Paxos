@@ -1,0 +1,23 @@
+[Member M2] - Listening on port 9002
+[Member M2] Command port listening on 9102
+[Acceptor M2] Received Prepare(M8:1) from Proposer M8
+[Acceptor M2] Sent Promise for M8:1 to Proposer M8
+[Acceptor M2] Received Prepare(M1:1) from Proposer M1
+[Acceptor M2] Ignored Prepare(M1:1), promised number is M8:1
+[Acceptor M2] Received AcceptRequest(M8:1, 'M8') from Proposer M8
+[Acceptor M2] Accepted proposal M8:1 with value 'M8'
+[Acceptor M2] Received AcceptRequest(M8:1, 'M8') from Proposer M8
+[Acceptor M2] Accepted proposal M8:1 with value 'M8'
+[Acceptor M2] Received AcceptRequest(M8:1, 'M8') from Proposer M8
+Learner M2 has learned the value: M8 for proposal number: M8:1
+[Acceptor M2] Accepted proposal M8:1 with value 'M8'
+[Acceptor M2] Received AcceptRequest(M8:1, 'M8') from Proposer M8
+[Acceptor M2] Accepted proposal M8:1 with value 'M8'
+[Acceptor M2] Received AcceptRequest(M8:1, 'M8') from Proposer M8
+[Acceptor M2] Accepted proposal M8:1 with value 'M8'
+Learner M2 has learned the value: M8 for proposal number: M8:1
+Learner M2 has learned the value: M8 for proposal number: M8:1
+Learner M2 has learned the value: M8 for proposal number: M8:1
+Learner M2 has learned the value: M8 for proposal number: M8:1
+Learner M2 has learned the value: M8 for proposal number: M8:1
+[Member M2] Shutting down...

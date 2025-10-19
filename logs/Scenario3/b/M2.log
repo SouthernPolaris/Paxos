@@ -6,18 +6,18 @@
 [Acceptor M2] Received Prepare(M2:1) from Proposer M2
 [Acceptor M2] Sent Promise for M2:1 to Proposer M2
 [Proposer M2] Received Promise for M2:1 from Acceptor M2
+[Proposer M2] Received Promise for M2:1 from Acceptor M9
 [Proposer M2] Received Promise for M2:1 from Acceptor M1
-[Proposer M2] Received Promise for M2:1 from Acceptor M7
-[Proposer M2] Received Promise for M2:1 from Acceptor M6
-[Proposer M2] Received Promise for M2:1 from Acceptor M3
-[Proposer M2] Sent Accept Request for M2:1 with value '{"type":"PREPARE","value":"M6","from":"M2"}'
 [Proposer M2] Received Promise for M2:1 from Acceptor M4
+[Proposer M2] Received Promise for M2:1 from Acceptor M5
+[Proposer M2] Sent Accept Request for M2:1 with value '{"type":"PREPARE","value":"M6","from":"M2"}'
+[Proposer M2] Received Promise for M2:1 from Acceptor M7
+[Proposer M2] Sent Accept Request for M2:1 with value '{"type":"PREPARE","value":"M6","from":"M2"}'
+[Proposer M2] Received Promise for M2:1 from Acceptor M3
 [Proposer M2] Sent Accept Request for M2:1 with value '{"type":"PREPARE","value":"M6","from":"M2"}'
 [Proposer M2] Received Promise for M2:1 from Acceptor M8
 [Proposer M2] Sent Accept Request for M2:1 with value '{"type":"PREPARE","value":"M6","from":"M2"}'
-[Proposer M2] Received Promise for M2:1 from Acceptor M9
-[Proposer M2] Sent Accept Request for M2:1 with value '{"type":"PREPARE","value":"M6","from":"M2"}'
-[Proposer M2] Received Promise for M2:1 from Acceptor M5
+[Proposer M2] Received Promise for M2:1 from Acceptor M6
 [Proposer M2] Sent Accept Request for M2:1 with value '{"type":"PREPARE","value":"M6","from":"M2"}'
 [Acceptor M2] Received AcceptRequest(M2:1, '{"type":"PREPARE","value":"M6","from":"M2"}') from Proposer M2
 [Acceptor M2] Accepted proposal M2:1 with value '{"type":"PREPARE","value":"M6","from":"M2"}'

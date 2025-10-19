@@ -1,19 +1,38 @@
-java.net.BindException: Address already in use
-	at java.base/sun.nio.ch.Net.bind0(Native Method)
-	at java.base/sun.nio.ch.Net.bind(Net.java:555)
-	at java.base/sun.nio.ch.Net.bind(Net.java:544)
-	at java.base/sun.nio.ch.NioSocketImpl.bind(NioSocketImpl.java:648)
-	at java.base/java.net.ServerSocket.bind(ServerSocket.java:388)
-	at java.base/java.net.ServerSocket.<init>(ServerSocket.java:274)
-	at java.base/java.net.ServerSocket.<init>(ServerSocket.java:167)
-	at network.SocketTransport.startListening(SocketTransport.java:43)
-	at member.CouncilMember.main(CouncilMember.java:75)
-	at org.codehaus.mojo.exec.ExecJavaMojo.doMain(ExecJavaMojo.java:371)
-	at org.codehaus.mojo.exec.ExecJavaMojo.doExec(ExecJavaMojo.java:360)
-	at org.codehaus.mojo.exec.ExecJavaMojo.lambda$execute$0(ExecJavaMojo.java:280)
-	at java.base/java.lang.Thread.run(Thread.java:840)
+[Member M5] - Listening on port 9005
 [Proposer M5] Auto-proposing value: M5
 [Proposer M5] Starting proposal M5:1 with value 'M5'
 [Proposer M5] Sent Prepare for M5:1 to [M1, M2, M3, M4, M5, M6, M7, M8, M9]
-[Member M5] Failed to start command server: Address already in use
+[Member M5] Command port listening on 9105
+[Acceptor M5] Received Prepare(M5:1) from Proposer M5
+[Acceptor M5] Sent Promise for M5:1 to Proposer M5
+[Proposer M5] Received Promise for M5:1 from Acceptor M5
+[Proposer M5] Received Promise for M5:1 from Acceptor M1
+[Proposer M5] Received Promise for M5:1 from Acceptor M2
+[Proposer M5] Received Promise for M5:1 from Acceptor M9
+[Proposer M5] Received Promise for M5:1 from Acceptor M6
+[Proposer M5] Sent Accept Request for M5:1 with value 'M5'
+[Proposer M5] Received Promise for M5:1 from Acceptor M7
+[Proposer M5] Sent Accept Request for M5:1 with value 'M5'
+[Proposer M5] Received Promise for M5:1 from Acceptor M3
+[Proposer M5] Sent Accept Request for M5:1 with value 'M5'
+[Proposer M5] Received Promise for M5:1 from Acceptor M4
+[Proposer M5] Sent Accept Request for M5:1 with value 'M5'
+[Proposer M5] Received Promise for M5:1 from Acceptor M8
+[Proposer M5] Sent Accept Request for M5:1 with value 'M5'
+[Acceptor M5] Received AcceptRequest(M5:1, 'M5') from Proposer M5
+[Acceptor M5] Accepted proposal M5:1 with value 'M5'
+[Acceptor M5] Received AcceptRequest(M5:1, 'M5') from Proposer M5
+[Acceptor M5] Accepted proposal M5:1 with value 'M5'
+[Acceptor M5] Received AcceptRequest(M5:1, 'M5') from Proposer M5
+[Acceptor M5] Accepted proposal M5:1 with value 'M5'
+[Acceptor M5] Received AcceptRequest(M5:1, 'M5') from Proposer M5
+[Acceptor M5] Accepted proposal M5:1 with value 'M5'
+[Acceptor M5] Received AcceptRequest(M5:1, 'M5') from Proposer M5
+[Acceptor M5] Accepted proposal M5:1 with value 'M5'
+Learner M5 has learned the value: M5 for proposal number: M5:1
+Learner M5 has learned the value: M5 for proposal number: M5:1
+Learner M5 has learned the value: M5 for proposal number: M5:1
+Learner M5 has learned the value: M5 for proposal number: M5:1
+Learner M5 has learned the value: M5 for proposal number: M5:1
+Learner M5 has learned the value: M5 for proposal number: M5:1
 [Member M5] Shutting down...
