@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+# TODO: Change from JSON to just the value string as proposal input
+
 LOG_ROOT="./logs/scenario3"
 FIFOS_ROOT="./fifos"
 CONFIG_DIR="./conf"

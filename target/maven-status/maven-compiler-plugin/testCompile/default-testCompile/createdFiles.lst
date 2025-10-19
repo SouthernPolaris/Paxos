@@ -1,0 +1,8 @@
+member/MemberConfigTest.class
+paxos_util/PaxosMessageTest.class
+paxos_logic/ProposerTest.class
+paxos_logic/LearnerTest.class
+paxos_logic/PaxosNodeTest.class
+member/CouncilMemberTest.class
+paxos_util/ProposalNumberTest.class
+paxos_logic/AcceptorTest.class

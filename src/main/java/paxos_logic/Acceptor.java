@@ -43,8 +43,15 @@ public class Acceptor {
             ProposalNumber proposalNum = new ProposalNumber(prepare.proposalNum.toString());
             System.out.println("[Acceptor " + memberId + "] Received Prepare(" + proposalNum + ") from Proposer " + fromProposerId);
 
-            if (promisedNumber == null || proposalNum.compareTo(promisedNumber) > 0) {
-                promisedNumber = proposalNum;
+            // If we haven't promised anything yet, or this proposal number is greater
+            // or equal to the promised number, reply with a Promise. When equal,
+            // we still send a Promise (tests expect promises to all proposers that
+            // use the same proposal number).
+            if (promisedNumber == null || proposalNum.compareTo(promisedNumber) >= 0) {
+                // Only update the promisedNumber when the incoming number is greater
+                if (promisedNumber == null || proposalNum.compareTo(promisedNumber) > 0) {
+                    promisedNumber = proposalNum;
+                }
 
                 Promise promise = new Promise(
                     String.valueOf(memberId),
@@ -83,8 +90,8 @@ public class Acceptor {
                 // Reply to proposer
                 networkTransport.sendMessage(fromProposerId, acceptedMsg);
 
-                // Notify learners
                 for (String learnerId : learnerIds) {
+                    if (learnerId.equals(fromProposerId)) continue;
                     networkTransport.sendMessage(learnerId, acceptedMsg);
                 }
 

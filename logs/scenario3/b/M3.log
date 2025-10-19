@@ -1,7 +1,0 @@
-[Member M3] - Listening on port 9003
-[Acceptor M3] Received Prepare(M2:1) from Proposer M2
-[Acceptor M3] Sent Promise for M2:1 to Proposer M2
-[Acceptor M3] Received AcceptRequest(M2:1, '{"type":"PROPOSE","value":"M6","from":"M2"}') from Proposer M2
-[Member M3] Crashing after sending first message!
-[Member M3] Shutting down...
-Learner M3 has learned the value: {"type":"PROPOSE","value":"M6","from":"M2"} for proposal number: M2:1
