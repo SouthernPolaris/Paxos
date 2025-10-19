@@ -34,16 +34,19 @@ public class PaxosNode {
 
     /**
      * Fully Gson-ready message dispatcher
+     * @param senderId The ID of the sender
+     * @param message The JSON message received
      */
     public void handleMessage(String senderId, String message) {
         try {
-            // Try to detect the message type by reading a "type" field
+            // Detect message type by reading "type" field
             PaxosMessage base = gson.fromJson(message, PaxosMessage.class);
             if (base == null || base.type == null) {
                 System.out.println("[PaxosNode " + memberId + "] Unknown message format: " + message);
                 return;
             }
 
+            // Choose based on type
             switch (base.type) {
                 case "PREPARE":
                     Prepare prepare = gson.fromJson(message, Prepare.class);
@@ -73,6 +76,12 @@ public class PaxosNode {
         }
     }
 
+    /**
+     * Starts automatic retrying of proposals with exponential backoff
+     * @param value The value to propose
+     * @param initialDelaySeconds Initial delay before first retry in seconds
+     * @param maxRetries Maximum number of retries
+     */
     public void startAutoRetryProposal(String value, int initialDelaySeconds, int maxRetries) {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -111,6 +120,7 @@ public class PaxosNode {
         scheduler.schedule(retryTask, initialDelaySeconds, TimeUnit.SECONDS);
     }
 
+    // Getters for components
     public Proposer getProposer() { 
         return proposer; 
     }
@@ -127,14 +137,17 @@ public class PaxosNode {
         return memberId; 
     }
 
+    public MemberTransport getTransport() {
+        return this.memberTransport;
+    }
+
+    /**
+     * Sets the network transport for communication
+     * @param transport The MemberTransport instance to use
+     */
     public void setTransport(MemberTransport transport) {
         if (transport == null) return;
         this.acceptor.setTransport(transport);
         this.proposer.setTransport(transport);
     }
-
-    public MemberTransport getTransport() {
-        return this.memberTransport;
-    }
-
 }

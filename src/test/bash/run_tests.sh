@@ -159,7 +159,7 @@ send_proposal_via_fifo() {
     local fifo="$TEST_DIR/$MEMBER.fifo"
     [ ! -p "$fifo" ] && { echo "Error: FIFO $fifo not found"; return 1; }
     
-    printf '{"type":"PROPOSE","value":"%s","from":"%s"}\n' "$VALUE" "$MEMBER" > "$fifo" &
+    printf '{"type":"PREPARE","value":"%s","from":"%s"}\n' "$VALUE" "$MEMBER" > "$fifo" &
     sleep 0.6
 }
 

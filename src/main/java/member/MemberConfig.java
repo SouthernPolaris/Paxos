@@ -2,6 +2,9 @@ package member;
 
 import java.net.InetSocketAddress;
 
+/**
+ * Configuration for a Council Member
+ */
 public class MemberConfig {
     public final InetSocketAddress address;
     public final Profile profile;

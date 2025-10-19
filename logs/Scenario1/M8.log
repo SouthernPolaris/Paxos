@@ -2,19 +2,20 @@
 [Member M8] Command port listening on 9108
 [Acceptor M8] Received Prepare(M5:1) from Proposer M5
 [Acceptor M8] Sent Promise for M5:1 to Proposer M5
+[Acceptor M8] Received AcceptRequest(M5:1, 'M5') from Proposer M5
+[Acceptor M8] Accepted proposal M5:1 with value 'M5'
+[Acceptor M8] Received AcceptRequest(M5:1, 'M5') from Proposer M5
+[Acceptor M8] Accepted proposal M5:1 with value 'M5'
+[Acceptor M8] Received AcceptRequest(M5:1, 'M5') from Proposer M5
+[Acceptor M8] Accepted proposal M5:1 with value 'M5'
+[Acceptor M8] Received AcceptRequest(M5:1, 'M5') from Proposer M5
+[Acceptor M8] Accepted proposal M5:1 with value 'M5'
+[Acceptor M8] Received AcceptRequest(M5:1, 'M5') from Proposer M5
+[Acceptor M8] Accepted proposal M5:1 with value 'M5'
 Learner M8 has learned the value: M5 for proposal number: M5:1
 Learner M8 has learned the value: M5 for proposal number: M5:1
-[Acceptor M8] Received AcceptRequest(M5:1, 'M5') from Proposer M5
-[Acceptor M8] Accepted proposal M5:1 with value 'M5'
-[Acceptor M8] Received AcceptRequest(M5:1, 'M5') from Proposer M5
 Learner M8 has learned the value: M5 for proposal number: M5:1
 Learner M8 has learned the value: M5 for proposal number: M5:1
-[Acceptor M8] Accepted proposal M5:1 with value 'M5'
-[Acceptor M8] Received AcceptRequest(M5:1, 'M5') from Proposer M5
-[Acceptor M8] Accepted proposal M5:1 with value 'M5'
-[Acceptor M8] Received AcceptRequest(M5:1, 'M5') from Proposer M5
-[Acceptor M8] Accepted proposal M5:1 with value 'M5'
-[Acceptor M8] Received AcceptRequest(M5:1, 'M5') from Proposer M5
-[Acceptor M8] Accepted proposal M5:1 with value 'M5'
+Learner M8 has learned the value: M5 for proposal number: M5:1
 Learner M8 has learned the value: M5 for proposal number: M5:1
 [Member M8] Shutting down...

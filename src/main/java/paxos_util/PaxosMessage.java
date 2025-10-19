@@ -1,7 +1,10 @@
 package paxos_util;
 
+/**
+ * Base class for Paxos messages
+ */
 public class PaxosMessage {
-    public String type;        // PREPARE, PROMISE, ACCEPT_REQUEST, ACCEPTED
+    public String type;
     public String fromMemberId;
     public ProposalNumber proposalNum;
     public String proposalValue;

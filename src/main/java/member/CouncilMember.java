@@ -10,7 +10,15 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
+/**
+ * Main class for a Council Member running Paxos
+ */
 public class CouncilMember {
+    /**
+     * Main method for Council Member
+     * @param args Command line arguments
+     * @throws Exception on error
+     */
     public static void main(String[] args) throws Exception {
         if (args.length < 1) {
             System.out.println("Usage: java CouncilMember <memberId> [--propose <value>] [--crashAfterSend]");
@@ -21,7 +29,7 @@ public class CouncilMember {
         String proposeValue = null;
         boolean crashAfterSend = false;
 
-        // Parse optional arguments
+        // Parse additional args
         for (int i = 1; i < args.length; i++) {
             if (args[i].equalsIgnoreCase("--propose") && i + 1 < args.length) {
                 proposeValue = args[i + 1];
@@ -43,10 +51,10 @@ public class CouncilMember {
         Set<String> acceptorIds = new HashSet<>(allConfigs.keySet());
         Set<String> learnerIds = new HashSet<>(acceptorIds);
 
-        // Create Paxos node (transport null for now)
+        // Create Paxos node
         PaxosNode node = new PaxosNode(memberId, acceptorIds, learnerIds, null);
 
-        // Create transport and link to node
+        // Link transport and node
         SocketTransport transport = new SocketTransport(
             memberId,
             myConfig.port,
@@ -56,7 +64,7 @@ public class CouncilMember {
             myConfig.profile
         );
 
-        // Enable crash-after-send if applicable
+        // Enable crash-after-send if specified
         if (crashAfterSend || myConfig.profile == Profile.FAILURE) {
             transport.setCrashAfterSend(true);
         }
@@ -66,6 +74,7 @@ public class CouncilMember {
         // Start Paxos listening
         transport.startListening();
 
+        // Graceful shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("[Member " + memberId + "] Shutting down...");
             transport.shutdown();
@@ -80,7 +89,7 @@ public class CouncilMember {
             node.getProposer().propose(proposeValue);
         }
 
-        // Background thread for stdin proposals (optional)
+        // Background thread for stdin proposals
         Thread stdinReader = new Thread(() -> {
             try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
                 String line;
@@ -98,7 +107,7 @@ public class CouncilMember {
         stdinReader.setDaemon(true);
         stdinReader.start();
 
-        // --- TCP Command Port Listener for runtime proposals ---
+        // Command Port Listener for runtime proposals
         int commandPort = myConfig.port + 100;
         Thread commandServer = new Thread(() -> {
             try (ServerSocket serverSocket = new ServerSocket(commandPort)) {
@@ -130,6 +139,12 @@ public class CouncilMember {
         latch.await();
     }
 
+    /**
+     * Loads network configuration from file
+     * @param path Path to network.config file
+     * @return Map of member IDs to their configurations
+     * @throws IOException on file read error
+     */
     private static Map<String, MemberConfig> loadNetworkConfig(String path) throws IOException {
         Map<String, MemberConfig> map = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {

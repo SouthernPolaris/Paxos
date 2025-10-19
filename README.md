@@ -65,12 +65,14 @@ Notes:
 - `logs/` — output logs created by scenario scripts
 - `conf/` — configuration files used by the scripts (e.g., `network.config`)
 
+## Config structure
+The config files are structured as a CSV-style file. Each line represents a node.
+
+Each line contains:
+```
+Name,hostname,port,TYPE
+```
+
 ## How tests are structured
 
 - Unit tests are in `src/test/java` and are executed by `mvn test`.
-
-## Troubleshooting
-
-- If `mvn test` fails with compilation errors, ensure your JAVA_HOME and `mvn` use Java 17.
-- If the bash scripts fail with permission denied: make them executable (`chmod +x script.sh`).
-- If a test fails and prints stack traces, see `target/surefire-reports/` for per-test logs and XML reports.

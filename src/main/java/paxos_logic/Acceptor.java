@@ -29,7 +29,9 @@ public class Acceptor {
     }
 
     /**
-     * Handles a Prepare message from a Proposer.
+     * Handles a Prepare message from a Proposer
+     * @param prepare The Prepare message received
+     * @param fromProposerId The ID of the Proposer who sent the message
      */
     public void handlePrepare(Prepare prepare, String fromProposerId) {
         lock.lock();
@@ -38,12 +40,9 @@ public class Acceptor {
             ProposalNumber proposalNum = new ProposalNumber(prepare.proposalNum.toString());
             System.out.println("[Acceptor " + memberId + "] Received Prepare(" + proposalNum + ") from Proposer " + fromProposerId);
 
-            // If we haven't promised anything yet, or this proposal number is greater
-            // or equal to the promised number, reply with a Promise. When equal,
-            // we still send a Promise (tests expect promises to all proposers that
-            // use the same proposal number).
             if (promisedNumber == null || proposalNum.compareTo(promisedNumber) >= 0) {
-                // Only update the promisedNumber when the incoming number is greater
+
+                // Update if incoming greater
                 if (promisedNumber == null || proposalNum.compareTo(promisedNumber) > 0) {
                     promisedNumber = proposalNum;
                 }
@@ -66,7 +65,9 @@ public class Acceptor {
     }
 
     /**
-     * Handles an Accept Request from a Proposer.
+     * Handles an Accept Request from a Proposer
+     * @param acceptRequest The Accept Request message received
+     * @param fromProposerId The ID of the Proposer who sent the message
      */
     public void handleAcceptRequest(AcceptRequest acceptRequest, String fromProposerId) {
         lock.lock();
@@ -85,6 +86,7 @@ public class Acceptor {
                 // Reply to proposer
                 networkTransport.sendMessage(fromProposerId, acceptedMsg);
 
+                // Notify all learners
                 for (String learnerId : learnerIds) {
                     if (learnerId.equals(fromProposerId)) continue;
                     networkTransport.sendMessage(learnerId, acceptedMsg);
@@ -99,6 +101,10 @@ public class Acceptor {
         }
     }
 
+    /**
+     * Sets the network transport for communication
+     * @param transport The MemberTransport instance to use
+     */
     public void setTransport(MemberTransport transport) {
         this.networkTransport = transport;
     }

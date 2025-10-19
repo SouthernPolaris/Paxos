@@ -10,7 +10,7 @@ import paxos_util.*;
 /**
  * Paxos Proposer
  *
- * Responsible for initiating proposals and handling promises/acceptances from Acceptors.
+ * Responsible for initiating proposals and handling promises/acceptances from Acceptors
  */
 public class Proposer {
     private final String id;
@@ -25,6 +25,7 @@ public class Proposer {
     private final Map<String, Promise> promisesReceived = new ConcurrentHashMap<>();
     private final Set<String> acceptedReceivedFrom = ConcurrentHashMap.newKeySet();
 
+    // Local sequence number for generating unique proposal numbers
     private int localSequence = 0;
 
     public Proposer(String id, Set<String> acceptorIds, MemberTransport networkTransport) {
@@ -35,7 +36,8 @@ public class Proposer {
     }
 
     /**
-     * Starts a new proposal with a given value.
+     * Starts a new proposal with a given value
+     * @param value The value to propose
      */
     public void propose(String value) {
         lock.lock();
@@ -53,7 +55,7 @@ public class Proposer {
     }
 
     /**
-     * Sends a Prepare message to all Acceptors.
+     * Sends a Prepare message to all Acceptors
      */
     private void sendPrepareMessage() {
         Prepare prepareMessage = new Prepare(id, proposalNumber);
@@ -62,7 +64,8 @@ public class Proposer {
     }
 
     /**
-     * Broadcasts a message to all Acceptors.
+     * Broadcasts a message to all Acceptors
+     * @param message The message to broadcast
      */
     private void broadcastToAcceptors(Object message) {
         if (message instanceof PaxosMessage pm) {
@@ -75,7 +78,8 @@ public class Proposer {
     }
 
     /**
-     * Handles a Promise message received from an Acceptor.
+     * Handles Promise message received from Acceptor
+     * @param promise The Promise message received
      */
     public void handlePromise(Promise promise) {
 
@@ -92,7 +96,7 @@ public class Proposer {
             promisesReceived.put(promise.fromMemberId, promise);
             System.out.println("[Proposer " + id + "] Received Promise for " + incomingNum + " from Acceptor " + promise.fromMemberId);
 
-            // If any acceptor already accepted a proposal, adopt the value of the highest-numbered one
+            // If any acceptor already accepted proposal, choose value of the highest
             Optional<Promise> highestAccepted = promisesReceived.values().stream()
                 .filter(p -> p.acceptedProposalNumber != null)
                 .max(Comparator.comparing(p -> new ProposalNumber(p.acceptedProposalNumber)));
@@ -114,7 +118,7 @@ public class Proposer {
     }
 
     /**
-     * Sends Accept Request to all Acceptors.
+     * Sends Accept Request to all Acceptors
      */
     private void sendAcceptRequest() {
         lock.lock();
@@ -129,7 +133,8 @@ public class Proposer {
     }
 
     /**
-     * Handles Accepted messages from Acceptors.
+     * Handles Accepted messages from Acceptors
+     * @param accepted The Accepted message received
      */
     public void handleAccepted(Accepted accepted) {
         lock.lock();
@@ -156,13 +161,15 @@ public class Proposer {
     }
 
     /**
-     * Notifies learners about the chosen proposal (placeholder for actual learner communication).
+     * Notifies learners about the chosen proposal
+     * @param acceptedMsg The Accepted message to send
      */
     private void notifyLearners() {
         Accepted acceptedMsg = new Accepted(id, proposalNumber, proposalValue);
 
         System.out.println("[Proposer " + id + "] Notifying learners about chosen proposal " + proposalNumber + " with value '" + proposalValue + "'");
 
+        // Send to all learners
         for (String learnerId : acceptorIds) {
             networkTransport.sendMessage(learnerId, acceptedMsg);
         }
@@ -170,7 +177,8 @@ public class Proposer {
 
 
     /**
-     * Calculates the majority size based on total acceptors.
+     * Calculates the majority size based on total acceptors
+     * @return The majority count
      */
     private int calculateMajority() {
         return (acceptorIds.size() / 2) + 1;

@@ -1,20 +1,21 @@
 [Member M7] - Listening on port 9007
+[Member M7] Command port listening on 9107
 [Acceptor M7] Received Prepare(M4:1) from Proposer M4
 [Acceptor M7] Sent Promise for M4:1 to Proposer M4
-[Acceptor M7] Received AcceptRequest(M4:1, '{"type":"PROPOSE","value":"M5","from":"M4"}') from Proposer M4
-[Acceptor M7] Accepted proposal M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
-[Acceptor M7] Received AcceptRequest(M4:1, '{"type":"PROPOSE","value":"M5","from":"M4"}') from Proposer M4
-[Member M7] Command port listening on 9107
-Learner M7 has learned the value: {"type":"PROPOSE","value":"M5","from":"M4"} for proposal number: M4:1
-[Acceptor M7] Accepted proposal M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
-[Acceptor M7] Received AcceptRequest(M4:1, '{"type":"PROPOSE","value":"M5","from":"M4"}') from Proposer M4
-Learner M7 has learned the value: {"type":"PROPOSE","value":"M5","from":"M4"} for proposal number: M4:1
-[Acceptor M7] Accepted proposal M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
-[Acceptor M7] Received AcceptRequest(M4:1, '{"type":"PROPOSE","value":"M5","from":"M4"}') from Proposer M4
-[Acceptor M7] Accepted proposal M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
-Learner M7 has learned the value: {"type":"PROPOSE","value":"M5","from":"M4"} for proposal number: M4:1
-[Acceptor M7] Received AcceptRequest(M4:1, '{"type":"PROPOSE","value":"M5","from":"M4"}') from Proposer M4
-[Acceptor M7] Accepted proposal M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
-Learner M7 has learned the value: {"type":"PROPOSE","value":"M5","from":"M4"} for proposal number: M4:1
-Learner M7 has learned the value: {"type":"PROPOSE","value":"M5","from":"M4"} for proposal number: M4:1
+[Acceptor M7] Received AcceptRequest(M4:1, '{"type":"PREPARE","value":"M5","from":"M4"}') from Proposer M4
+[Acceptor M7] Accepted proposal M4:1 with value '{"type":"PREPARE","value":"M5","from":"M4"}'
+[Acceptor M7] Received AcceptRequest(M4:1, '{"type":"PREPARE","value":"M5","from":"M4"}') from Proposer M4
+[Acceptor M7] Accepted proposal M4:1 with value '{"type":"PREPARE","value":"M5","from":"M4"}'
+[Acceptor M7] Received AcceptRequest(M4:1, '{"type":"PREPARE","value":"M5","from":"M4"}') from Proposer M4
+[Acceptor M7] Accepted proposal M4:1 with value '{"type":"PREPARE","value":"M5","from":"M4"}'
+[Acceptor M7] Received AcceptRequest(M4:1, '{"type":"PREPARE","value":"M5","from":"M4"}') from Proposer M4
+[Acceptor M7] Accepted proposal M4:1 with value '{"type":"PREPARE","value":"M5","from":"M4"}'
+[Acceptor M7] Received AcceptRequest(M4:1, '{"type":"PREPARE","value":"M5","from":"M4"}') from Proposer M4
+Learner M7 has learned the value: {"type":"PREPARE","value":"M5","from":"M4"} for proposal number: M4:1
+[Acceptor M7] Accepted proposal M4:1 with value '{"type":"PREPARE","value":"M5","from":"M4"}'
+Learner M7 has learned the value: {"type":"PREPARE","value":"M5","from":"M4"} for proposal number: M4:1
+Learner M7 has learned the value: {"type":"PREPARE","value":"M5","from":"M4"} for proposal number: M4:1
+Learner M7 has learned the value: {"type":"PREPARE","value":"M5","from":"M4"} for proposal number: M4:1
+Learner M7 has learned the value: {"type":"PREPARE","value":"M5","from":"M4"} for proposal number: M4:1
+Learner M7 has learned the value: {"type":"PREPARE","value":"M5","from":"M4"} for proposal number: M4:1
 [Member M7] Shutting down...

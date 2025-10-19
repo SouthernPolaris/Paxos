@@ -8,6 +8,11 @@ import paxos_util.ProposalNumber;
 
 import java.util.*;
 
+/**
+ * Paxos Learner
+ *
+ * Listens for Accepted messages from Acceptors to determine when value is chosen
+ */
 public class Learner {
     private final String memberId;
     private final Integer totalAcceptors;
@@ -24,6 +29,10 @@ public class Learner {
         this.totalAcceptors = totalAcceptors;
     }
 
+    /**
+     * Handles Accepted message from Acceptor
+     * @param accepted The Accepted message received
+     */
     public void handleAccepted(Accepted accepted) {
 
         lock.lock();
@@ -47,10 +56,18 @@ public class Learner {
         }
     }
 
+    /*
+     * Computes the majority count based on total acceptors
+     * @return The majority count
+     */
     private Integer computeMajority() {
         return (int) ((Math.floor(totalAcceptors / 2) + 1));
     }
 
+    /*
+     * Gets the last learned value
+     * @return The last learned value, or null if none learned yet
+     */
     public String getLastLearnedValue() {
         lock.lock();
         try {
