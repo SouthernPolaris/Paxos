@@ -1,4 +1,5 @@
 [Member M9] - Listening on port 9009
+[Member M9] Command port listening on 9109
 [Acceptor M9] Received Prepare(M8:1) from Proposer M8
 [Acceptor M9] Sent Promise for M8:1 to Proposer M8
 [Acceptor M9] Received Prepare(M1:1) from Proposer M1
@@ -13,8 +14,6 @@
 [Acceptor M9] Accepted proposal M8:1 with value 'M8'
 [Acceptor M9] Received AcceptRequest(M8:1, 'M8') from Proposer M8
 [Acceptor M9] Accepted proposal M8:1 with value 'M8'
-Learner M9 has learned the value: M8 for proposal number: M8:1
-[Member M9] Command port listening on 9109
 Learner M9 has learned the value: M8 for proposal number: M8:1
 Learner M9 has learned the value: M8 for proposal number: M8:1
 Learner M9 has learned the value: M8 for proposal number: M8:1

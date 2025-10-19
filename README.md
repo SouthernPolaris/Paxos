@@ -32,6 +32,7 @@ The test suite uses JUnit 5 and Mockito (test-scoped dependencies are declared i
 
 ## Running the program
 ```bash
+#e.g. Name = M1
 mvn -q exec:java -Dexec.mainClass="member.CouncilMember" -Dexec.args="[Name]"
 ```
 This brings up an instance of Council Member.

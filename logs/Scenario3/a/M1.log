@@ -9,11 +9,9 @@
 [Acceptor M1] Received AcceptRequest(M4:1, '{"type":"PREPARE","value":"M5","from":"M4"}') from Proposer M4
 [Acceptor M1] Accepted proposal M4:1 with value '{"type":"PREPARE","value":"M5","from":"M4"}'
 [Acceptor M1] Received AcceptRequest(M4:1, '{"type":"PREPARE","value":"M5","from":"M4"}') from Proposer M4
-Learner M1 has learned the value: {"type":"PREPARE","value":"M5","from":"M4"} for proposal number: M4:1
 [Acceptor M1] Accepted proposal M4:1 with value '{"type":"PREPARE","value":"M5","from":"M4"}'
 [Acceptor M1] Received AcceptRequest(M4:1, '{"type":"PREPARE","value":"M5","from":"M4"}') from Proposer M4
 [Acceptor M1] Accepted proposal M4:1 with value '{"type":"PREPARE","value":"M5","from":"M4"}'
-Learner M1 has learned the value: {"type":"PREPARE","value":"M5","from":"M4"} for proposal number: M4:1
 Learner M1 has learned the value: {"type":"PREPARE","value":"M5","from":"M4"} for proposal number: M4:1
 Learner M1 has learned the value: {"type":"PREPARE","value":"M5","from":"M4"} for proposal number: M4:1
 Learner M1 has learned the value: {"type":"PREPARE","value":"M5","from":"M4"} for proposal number: M4:1

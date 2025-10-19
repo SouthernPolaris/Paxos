@@ -3,7 +3,6 @@
 [Acceptor M7] Received Prepare(M2:1) from Proposer M2
 [Acceptor M7] Sent Promise for M2:1 to Proposer M2
 [Acceptor M7] Received AcceptRequest(M2:1, '{"type":"PREPARE","value":"M6","from":"M2"}') from Proposer M2
-Learner M7 has learned the value: {"type":"PREPARE","value":"M6","from":"M2"} for proposal number: M2:1
 [Acceptor M7] Accepted proposal M2:1 with value '{"type":"PREPARE","value":"M6","from":"M2"}'
 [Acceptor M7] Received AcceptRequest(M2:1, '{"type":"PREPARE","value":"M6","from":"M2"}') from Proposer M2
 [Acceptor M7] Accepted proposal M2:1 with value '{"type":"PREPARE","value":"M6","from":"M2"}'
