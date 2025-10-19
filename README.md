@@ -6,6 +6,7 @@ This repository implements a simplified Paxos system. It contains Java source fo
 
 - Java 17 (JDK) installed
 - Maven 3 or higher installed
+- Python3 for bash scripting
 
 Verify Java and Maven are available:
 

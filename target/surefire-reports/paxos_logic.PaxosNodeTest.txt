@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: paxos_logic.PaxosNodeTest
 -------------------------------------------------------------------------------
-Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.314 s -- in paxos_logic.PaxosNodeTest
+Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.593 s -- in paxos_logic.PaxosNodeTest
