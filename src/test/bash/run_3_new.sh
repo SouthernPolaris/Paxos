@@ -2,11 +2,10 @@
 set -euo pipefail
 
 LOG_ROOT="./logs/scenario3"
-FIFOS_ROOT="./fifos"
 CONFIG_DIR="./conf"
 CONFIG_FILE="$CONFIG_DIR/network.config"
 
-mkdir -p "$LOG_ROOT" "$FIFOS_ROOT" "$CONFIG_DIR"
+mkdir -p "$LOG_ROOT" "$CONFIG_DIR"
 
 MEMBERS=(M1 M2 M3 M4 M5 M6 M7 M8 M9)
 declare -A FIFO_FDS
@@ -26,7 +25,6 @@ cleanup_fifos() {
         eval "exec ${FD}>&-" 2>/dev/null || true
     done
     FIFO_FDS=()
-    [ -d "$FIFOS_ROOT" ] && rm -rf "$FIFOS_ROOT"
 }
 
 cleanup() {
@@ -50,10 +48,11 @@ EOF
 }
 
 create_fifos_for_subtest() {
-    local DIR="$FIFOS_ROOT/$1"
-    mkdir -p "$DIR"
+    local SUB=$1
+    local TEST_DIR="$LOG_ROOT/$SUB"
+    mkdir -p "$TEST_DIR"
     for MEMBER in "${MEMBERS[@]}"; do
-        fifo="$DIR/$MEMBER.in"
+        fifo="$TEST_DIR/$MEMBER.fifo"
         [ ! -p "$fifo" ] && { rm -f "$fifo"; mkfifo "$fifo"; }
     done
 }
@@ -62,9 +61,10 @@ start_member() {
     local MEMBER=$1 PROFILE=$2 EXTRA_ARGS=${3:-} TEST_DIR=$4 SUB=$5
     mkdir -p "$TEST_DIR"
     local logfile="$TEST_DIR/$MEMBER.log"
+    local pidfile="$TEST_DIR/$MEMBER.pid"
     : > "$logfile"
 
-    local fifo="$FIFOS_ROOT/$SUB/$MEMBER.in"
+    local fifo="$TEST_DIR/$MEMBER.fifo"
     [ ! -p "$fifo" ] && { mkdir -p "$(dirname "$fifo")"; mkfifo "$fifo"; }
 
     exec {FD}<> "$fifo"
@@ -73,6 +73,8 @@ start_member() {
     mvn -q exec:java -Dexec.mainClass="member.CouncilMember" \
         -Dexec.args="$MEMBER --profile $PROFILE $EXTRA_ARGS" \
         < /proc/$$/fd/$FD > "$logfile" 2>&1 &
+    
+    echo $! > "$pidfile"
     disown
     sleep 0.05
 }
@@ -91,7 +93,8 @@ wait_for_listening() {
 
 send_proposal_via_fifo() {
     local SUB=$1 MEMBER=$2 VALUE=$3
-    local fifo="$FIFOS_ROOT/$SUB/$MEMBER.in"
+    local TEST_DIR="$LOG_ROOT/$SUB"
+    local fifo="$TEST_DIR/$MEMBER.fifo"
     [ ! -p "$fifo" ] && { echo "Error: FIFO $fifo not found"; return 1; }
     
     printf '{"type":"PROPOSE","value":"%s","from":"%s"}\n' "$VALUE" "$MEMBER" > "$fifo" &
@@ -186,7 +189,7 @@ run_subtest() {
     
     cleanup_procs
     mkdir -p "$TEST_DIR"
-    rm -f "$TEST_DIR"/*.log
+    rm -f "$TEST_DIR"/*.log "$TEST_DIR"/*.pid "$TEST_DIR"/*.fifo
     create_fifos_for_subtest "$SUB"
 
     for i in "${!MEMBERS[@]}"; do

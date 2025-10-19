@@ -4,20 +4,17 @@
 [Acceptor M8] Sent Promise for M4:1 to Proposer M4
 [Acceptor M8] Received AcceptRequest(M4:1, 'M7') from Proposer M4
 [Acceptor M8] Accepted proposal M4:1 with value 'M7'
+[Acceptor M8] Received AcceptRequest(M4:1, 'M7') from Proposer M4
+[Acceptor M8] Accepted proposal M4:1 with value 'M7'
 [Member M8] Failed to connect to localhost:9003 - Connection refused
 [Acceptor M8] Received AcceptRequest(M4:1, 'M7') from Proposer M4
 [Acceptor M8] Accepted proposal M4:1 with value 'M7'
+[Member M8] Failed to connect to localhost:9003 - Connection refused
 Learner M8 has learned the value: M7 for proposal number: M4:1
-[Acceptor M8] Received AcceptRequest(M4:1, 'M7') from Proposer M4
-[Acceptor M8] Accepted proposal M4:1 with value 'M7'
-[Member M8] Failed to connect to localhost:9003 - Connection refused
 [Member M8] Failed to connect to localhost:9003 - Connection refused
 Learner M8 has learned the value: M7 for proposal number: M4:1
 [Member M8] Shutting down...
+Learner M8 has learned the value: M7 for proposal number: M4:1
 [Acceptor M8] Received AcceptRequest(M4:1, 'M7') from Proposer M4
 [Acceptor M8] Accepted proposal M4:1 with value 'M7'
-Learner M8 has learned the value: M7 for proposal number: M4:1
-[Member M8] Failed to connect to localhost:9004 - Connection refused
-[Member M8] Failed to connect to localhost:9005 - Connection refused
 [Member M8] Failed to connect to localhost:9002 - Connection refused
-[Member M8] Failed to connect to localhost:9003 - Connection refused

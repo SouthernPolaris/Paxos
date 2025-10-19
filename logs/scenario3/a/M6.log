@@ -8,15 +8,13 @@
 [Acceptor M6] Accepted proposal M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
 [Acceptor M6] Received AcceptRequest(M4:1, '{"type":"PROPOSE","value":"M5","from":"M4"}') from Proposer M4
 [Acceptor M6] Accepted proposal M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
+Learner M6 has learned the value: {"type":"PROPOSE","value":"M5","from":"M4"} for proposal number: M4:1
 [Acceptor M6] Received AcceptRequest(M4:1, '{"type":"PROPOSE","value":"M5","from":"M4"}') from Proposer M4
 [Acceptor M6] Accepted proposal M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
 Learner M6 has learned the value: {"type":"PROPOSE","value":"M5","from":"M4"} for proposal number: M4:1
 Learner M6 has learned the value: {"type":"PROPOSE","value":"M5","from":"M4"} for proposal number: M4:1
+[Acceptor M6] Received AcceptRequest(M4:1, '{"type":"PROPOSE","value":"M5","from":"M4"}') from Proposer M4
+[Acceptor M6] Accepted proposal M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
 Learner M6 has learned the value: {"type":"PROPOSE","value":"M5","from":"M4"} for proposal number: M4:1
 Learner M6 has learned the value: {"type":"PROPOSE","value":"M5","from":"M4"} for proposal number: M4:1
 [Member M6] Shutting down...
-[Acceptor M6] Received AcceptRequest(M4:1, '{"type":"PROPOSE","value":"M5","from":"M4"}') from Proposer M4
-[Acceptor M6] Accepted proposal M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
-[Member M6] Failed to connect to localhost:9001 - Connection refused
-[Member M6] Failed to connect to localhost:9003 - Connection refused
-Learner M6 has learned the value: {"type":"PROPOSE","value":"M5","from":"M4"} for proposal number: M4:1

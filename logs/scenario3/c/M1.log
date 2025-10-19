@@ -4,9 +4,9 @@
 [Acceptor M1] Sent Promise for M4:1 to Proposer M4
 [Acceptor M1] Received AcceptRequest(M4:1, 'M7') from Proposer M4
 [Acceptor M1] Accepted proposal M4:1 with value 'M7'
+[Member M1] Failed to connect to localhost:9003 - Connection refused
 [Acceptor M1] Received AcceptRequest(M4:1, 'M7') from Proposer M4
 [Acceptor M1] Accepted proposal M4:1 with value 'M7'
-[Member M1] Failed to connect to localhost:9003 - Connection refused
 [Member M1] Failed to connect to localhost:9003 - Connection refused
 [Acceptor M1] Received AcceptRequest(M4:1, 'M7') from Proposer M4
 [Acceptor M1] Accepted proposal M4:1 with value 'M7'

@@ -7,14 +7,13 @@
 [Member M9] Failed to connect to localhost:9003 - Connection refused
 [Acceptor M9] Received AcceptRequest(M4:1, 'M7') from Proposer M4
 [Acceptor M9] Accepted proposal M4:1 with value 'M7'
+[Member M9] Failed to connect to localhost:9003 - Connection refused
 [Acceptor M9] Received AcceptRequest(M4:1, 'M7') from Proposer M4
 [Acceptor M9] Accepted proposal M4:1 with value 'M7'
-[Member M9] Failed to connect to localhost:9003 - Connection refused
-[Member M9] Failed to connect to localhost:9003 - Connection refused
 Learner M9 has learned the value: M7 for proposal number: M4:1
 Learner M9 has learned the value: M7 for proposal number: M4:1
+[Member M9] Failed to connect to localhost:9003 - Connection refused
 Learner M9 has learned the value: M7 for proposal number: M4:1
 [Member M9] Shutting down...
 [Acceptor M9] Received AcceptRequest(M4:1, 'M7') from Proposer M4
 [Acceptor M9] Accepted proposal M4:1 with value 'M7'
-[Member M9] Failed to connect to localhost:9003 - Connection refused
