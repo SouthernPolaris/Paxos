@@ -6,6 +6,9 @@ import network.MemberTransport;
 import paxos_util.*;
 
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class PaxosNode {
     private final String memberId;
@@ -68,6 +71,44 @@ public class PaxosNode {
         } catch (JsonSyntaxException e) {
             System.out.println("[PaxosNode " + memberId + "] Failed to parse JSON message: " + e.getMessage());
         }
+    }
+
+    public void startAutoRetryProposal(String value, int initialDelaySeconds, int maxRetries) {
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+        Runnable retryTask = new Runnable() {
+            int attempt = 0;
+            int delay = initialDelaySeconds;
+
+            @Override
+            public void run() {
+                // Check if a value has already been learned
+                String learnedValue = learner.getLastLearnedValue();
+                if (learnedValue == null) {
+                    System.out.println("[PaxosNode " + memberId + "] No value learned yet; retrying proposal attempt " + (attempt + 1));
+                    try {
+                        proposer.propose(value);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    // Exponential backoff for next retry
+                    attempt++;
+                    if (attempt < maxRetries) {
+                        delay = Math.min(delay * 2, 16);
+                        scheduler.schedule(this, delay, TimeUnit.SECONDS);
+                    } else {
+                        System.out.println("[PaxosNode " + memberId + "] Max retry attempts reached. Stopping auto-retry.");
+                        scheduler.shutdown();
+                    }
+                } else {
+                    System.out.println("[PaxosNode " + memberId + "] Value already learned: " + learnedValue + ". Stopping auto-retry.");
+                    scheduler.shutdown();
+                }
+            }
+        };
+
+        scheduler.schedule(retryTask, initialDelaySeconds, TimeUnit.SECONDS);
     }
 
     public Proposer getProposer() { 

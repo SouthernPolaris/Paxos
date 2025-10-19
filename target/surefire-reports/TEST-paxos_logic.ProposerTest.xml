@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="paxos_logic.ProposerTest" time="0.138" tests="8" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="paxos_logic.ProposerTest" time="0.107" tests="8" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
@@ -12,7 +12,7 @@
     <property name="java.vm.specification.version" value="17"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="sun.boot.library.path" value="/usr/lib/jvm/java-17-openjdk-amd64/lib"/>
-    <property name="sun.java.command" value="/home/gilded-andromeda/Uni/2025/DS/A3Actual/target/surefire/surefirebooter-20251019185504591_3.jar /home/gilded-andromeda/Uni/2025/DS/A3Actual/target/surefire 2025-10-19T18-55-04_379-jvmRun1 surefire-20251019185504591_1tmp surefire_0-20251019185504591_2tmp"/>
+    <property name="sun.java.command" value="/home/gilded-andromeda/Uni/2025/DS/A3Actual/target/surefire/surefirebooter-20251019204513940_3.jar /home/gilded-andromeda/Uni/2025/DS/A3Actual/target/surefire 2025-10-19T20-45-13_687-jvmRun1 surefire-20251019204513940_1tmp surefire_0-20251019204513940_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="surefire.test.class.path" value="/home/gilded-andromeda/Uni/2025/DS/A3Actual/target/test-classes:/home/gilded-andromeda/Uni/2025/DS/A3Actual/target/classes:/home/gilded-andromeda/.m2/repository/org/junit/jupiter/junit-jupiter/5.8.2/junit-jupiter-5.8.2.jar:/home/gilded-andromeda/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.8.2/junit-jupiter-api-5.8.2.jar:/home/gilded-andromeda/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/home/gilded-andromeda/.m2/repository/org/junit/platform/junit-platform-commons/1.8.2/junit-platform-commons-1.8.2.jar:/home/gilded-andromeda/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/gilded-andromeda/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.8.2/junit-jupiter-params-5.8.2.jar:/home/gilded-andromeda/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.8.2/junit-jupiter-engine-5.8.2.jar:/home/gilded-andromeda/.m2/repository/org/junit/platform/junit-platform-engine/1.8.2/junit-platform-engine-1.8.2.jar:/home/gilded-andromeda/.m2/repository/org/mockito/mockito-core/5.18.0/mockito-core-5.18.0.jar:/home/gilded-andromeda/.m2/repository/net/bytebuddy/byte-buddy/1.17.5/byte-buddy-1.17.5.jar:/home/gilded-andromeda/.m2/repository/net/bytebuddy/byte-buddy-agent/1.17.5/byte-buddy-agent-1.17.5.jar:/home/gilded-andromeda/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/gilded-andromeda/.m2/repository/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar:"/>
     <property name="sun.cpu.endian" value="little"/>
@@ -27,7 +27,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="/home/gilded-andromeda/Uni/2025/DS/A3Actual/target/surefire/surefirebooter-20251019185504591_3.jar"/>
+    <property name="surefire.real.class.path" value="/home/gilded-andromeda/Uni/2025/DS/A3Actual/target/surefire/surefirebooter-20251019204513940_3.jar"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="17.0.16+8-Ubuntu-0ubuntu124.04.1"/>
     <property name="user.name" value="gilded-andromeda"/>
@@ -52,12 +52,12 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="61.0"/>
   </properties>
-  <testcase name="testSendAcceptRequestOnMajorityPromises" classname="paxos_logic.ProposerTest" time="0.018"/>
-  <testcase name="testAdoptHigherAcceptedValue" classname="paxos_logic.ProposerTest" time="0.016"/>
-  <testcase name="testDuplicatePromises" classname="paxos_logic.ProposerTest" time="0.009"/>
-  <testcase name="testIgnoreWrongProposalNumberPromises" classname="paxos_logic.ProposerTest" time="0.012"/>
-  <testcase name="testNotifyLearnersOnMajorityAccepted" classname="paxos_logic.ProposerTest" time="0.021"/>
-  <testcase name="testThreadSafety" classname="paxos_logic.ProposerTest" time="0.025"/>
-  <testcase name="testConcurrentProposals" classname="paxos_logic.ProposerTest" time="0.006"/>
+  <testcase name="testSendAcceptRequestOnMajorityPromises" classname="paxos_logic.ProposerTest" time="0.01"/>
+  <testcase name="testAdoptHigherAcceptedValue" classname="paxos_logic.ProposerTest" time="0.01"/>
+  <testcase name="testDuplicatePromises" classname="paxos_logic.ProposerTest" time="0.011"/>
+  <testcase name="testIgnoreWrongProposalNumberPromises" classname="paxos_logic.ProposerTest" time="0.007"/>
+  <testcase name="testNotifyLearnersOnMajorityAccepted" classname="paxos_logic.ProposerTest" time="0.015"/>
+  <testcase name="testThreadSafety" classname="paxos_logic.ProposerTest" time="0.018"/>
+  <testcase name="testConcurrentProposals" classname="paxos_logic.ProposerTest" time="0.008"/>
   <testcase name="testSequenceNumberIncrement" classname="paxos_logic.ProposerTest" time="0.01"/>
 </testsuite>

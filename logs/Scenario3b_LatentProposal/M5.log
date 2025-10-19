@@ -1,0 +1,17 @@
+[Member M5] - Listening on port 9005
+[Acceptor M5] Received Prepare(M2:1) from Proposer M2
+[Acceptor M5] Sent Promise for M2:1 to Proposer M2
+[Acceptor M5] Received AcceptRequest(M2:1, 'M2') from Proposer M2
+[Acceptor M5] Accepted proposal M2:1 with value 'M2'
+[Member M5] Failed to connect to localhost:9003 - Connection refused
+Learner M5 has learned the value: M2 for proposal number: M2:1
+[Acceptor M5] Received AcceptRequest(M2:1, 'M2') from Proposer M2
+[Acceptor M5] Accepted proposal M2:1 with value 'M2'
+[Member M5] Shutting down...
+[Member M5] Failed to connect to localhost:9003 - Connection refused
+Learner M5 has learned the value: M2 for proposal number: M2:1
+[Acceptor M5] Received AcceptRequest(M2:1, 'M2') from Proposer M2
+[Acceptor M5] Accepted proposal M2:1 with value 'M2'
+[Member M5] Failed to connect to localhost:9003 - Connection refused
+Learner M5 has learned the value: M2 for proposal number: M2:1
+Learner M5 has learned the value: M2 for proposal number: M2:1

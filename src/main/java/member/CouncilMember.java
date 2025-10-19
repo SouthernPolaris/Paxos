@@ -78,6 +78,7 @@ public class CouncilMember {
         if (proposeValue != null) {
             System.out.println("[Proposer " + memberId + "] Auto-proposing value: " + proposeValue);
             node.getProposer().propose(proposeValue);
+            // node.startAutoRetryProposal(proposeValue, 2, 5);
         }
 
         // Start a background thread that reads proposals from stdin (one per line) and proposes them.

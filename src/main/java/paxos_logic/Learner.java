@@ -4,6 +4,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import paxos_util.Accepted;
+import paxos_util.ProposalNumber;
 
 import java.util.*;
 
@@ -12,6 +13,9 @@ public class Learner {
     private final Integer totalAcceptors;
 
     private final ReentrantLock lock = new ReentrantLock();
+
+    private Map<ProposalNumber, String> learnedValues = new ConcurrentHashMap<>();
+    private ProposalNumber lastLearnedValue;
 
     private final Map<String, Set<String>> acceptedValues = new ConcurrentHashMap<>();
 
@@ -33,8 +37,9 @@ public class Learner {
 
             if (count >= computeMajority()) {
                 System.out.println("Learner " + memberId + " has learned the value: " + accepted.proposalValue + " for proposal number: " + accepted.proposalNum);
-                // Once learned, we can clear the accepted values to avoid re-learning
-                // Unsure if this is the best way to handle it or if even needed
+                System.out.flush();
+                learnedValues.put(accepted.proposalNum, accepted.proposalValue);
+                lastLearnedValue = accepted.proposalNum;
                 acceptedValues.remove(key);
             }
         } finally {
@@ -44,5 +49,18 @@ public class Learner {
 
     private Integer computeMajority() {
         return (int) ((Math.floor(totalAcceptors / 2) + 1));
+    }
+
+    public String getLastLearnedValue() {
+        lock.lock();
+        try {
+            if (lastLearnedValue != null) {
+                return learnedValues.get(lastLearnedValue);
+            } else {
+                return null;
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 }
