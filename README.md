@@ -1,4 +1,4 @@
-# Paxos — Assignment 3
+# Paxos Implementation
 
 This repository implements a simplified Paxos system. It contains Java source for Proposers, Acceptors, Learners, networking transports, and unit tests.
 
@@ -31,11 +31,13 @@ The test suite uses JUnit 5 and Mockito (test-scoped dependencies are declared i
 
 ## Running the program
 ```bash
-mvn -q exec:java -Dexec.mainClass="member.CouncilMember"
+mvn -q exec:java -Dexec.mainClass="member.CouncilMember" -Dexec.args="[Name]"
 ```
 This brings up an instance of Council Member.
 
 **You must bring up the same number of instances of Council Member as there are entries in `network.conf` or wherever else the configuration is set from.**
+
+You can use the `network.conf` file or similar to set the reliability of the file
 
 ## Running the demo / scenario scripts
 
@@ -45,10 +47,10 @@ Usage example:
 
 ```bash
 # Make scripts executable
-chmod +x run_tests.sh
+chmod +x ./src/test/bash/run_tests.sh
 
 # Run all scenario scripts
-./run_tests.sh
+./src/test/bash/run_tests.sh
 ```
 
 Notes:
@@ -70,7 +72,7 @@ The config files are structured as a CSV-style file. Each line represents a node
 
 Each line contains:
 ```
-Name,hostname,port,TYPE
+Name,hostname,port,RELIABILITY_TYPE
 ```
 
 ## How tests are structured
