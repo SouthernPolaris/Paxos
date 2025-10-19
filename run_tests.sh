@@ -72,6 +72,70 @@ function wait_for_consensus() {
     return 1
   }
 
+  wait_for_subset_learners_consensus() {
+    local TEST_DIR=$1
+    local TIMEOUT=${2:-60}
+    shift 2
+    local members_to_check=("$@")
+
+    local start=$(date +%s)
+    echo "[wait-subset] Waiting for members (${members_to_check[*]}) in $TEST_DIR to learn the same value..."
+
+    while true; do
+        declare -A seen
+        all_have=1
+        values_list=""
+
+        for MEMBER in "${members_to_check[@]}"; do
+            logfile="$TEST_DIR/$MEMBER.log"
+            if [ ! -f "$logfile" ]; then
+                all_have=0
+                break
+            fi
+            if ! grep -qi "learn" "$logfile" 2>/dev/null; then
+                all_have=0
+                break
+            fi
+            val=$(extract_learned_value "$logfile")
+            if [ -z "$val" ]; then
+                all_have=0
+                break
+            fi
+            seen["$val"]=1
+            values_list+="$MEMBER:$val "
+        done
+
+        if (( all_have == 1 )); then
+            unique_count=0
+            last_val=""
+            for k in "${!seen[@]}"; do
+                unique_count=$((unique_count+1))
+                last_val="$k"
+            done
+
+            if (( unique_count == 1 )); then
+                echo "[wait-subset] SUCCESS: subset members learned value '$last_val'. Details: $values_list"
+                return 0
+            else
+                echo "[wait-subset] Conflict among subset: $values_list"
+                # keep waiting up to timeout in case of late convergence
+            fi
+        fi
+
+        sleep 1
+        if (( $(date +%s) - start > TIMEOUT )); then
+            echo "[wait-subset] TIMEOUT after ${TIMEOUT}s waiting for subset to agree in $TEST_DIR"
+            echo "[debug] Per-member learning lines (last 100 lines of each subset log):"
+            for MEMBER in "${members_to_check[@]}"; do
+                f="$TEST_DIR/$MEMBER.log"
+                echo "----- $f -----"
+                tail -n 100 "$f" || true
+            done
+            return 1
+        fi
+    done
+  }
+
 function start_members() {
   # args: associative array of profiles, scenario_dir, optional proposer_id, optional proposed_value
   declare -n profs="$1"

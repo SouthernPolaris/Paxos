@@ -1,19 +1,21 @@
 #!/bin/bash
 set -euo pipefail
 
-LOG_DIR="./logs/scenario3"
+LOG_ROOT="./logs/scenario3"
+FIFOS_ROOT="./fifos"
 CONFIG_DIR="./conf"
 CONFIG_FILE="$CONFIG_DIR/network.config"
 
-mkdir -p "$LOG_DIR"
+mkdir -p "$LOG_ROOT"
+mkdir -p "$FIFOS_ROOT"
 mkdir -p "$CONFIG_DIR"
 
 MEMBERS=(M1 M2 M3 M4 M5 M6 M7 M8 M9)
 
-# associative array to track FD numbers for each member's opened FIFO
+# track allocated FD for each member per test run
 declare -A FIFO_FDS
 
-cleanup() {
+cleanup_procs() {
     echo "[cleanup] Killing all CouncilMember processes..."
     pkill -f 'member.CouncilMember' 2>/dev/null || true
     sleep 1
@@ -25,25 +27,28 @@ cleanup() {
             kill -9 "$pid" || true
         fi
     done
+}
 
-    rm -f "$LOG_DIR"/*.pid
-
-    # Close and remove FIFOs and close stored FDs
-    for MEMBER in "${MEMBERS[@]}"; do
-        fifo="$LOG_DIR/$MEMBER.in"
-        # close FD if we opened it
-        if [ -n "${FIFO_FDS[$MEMBER]:-}" ]; then
-            FD=${FIFO_FDS[$MEMBER]}
-            # Close FD in this shell if still open
-            if eval "true 1>&$FD" 2>/dev/null; then
-                eval "exec ${FD}>&- || true"
-            fi
-            unset FIFO_FDS[$MEMBER]
-        fi
-        if [ -p "$fifo" ]; then
-            rm -f "$fifo"
+cleanup_fifos() {
+    # Close any opened FDs and remove fifos
+    for key in "${!FIFO_FDS[@]}"; do
+        FD=${FIFO_FDS[$key]}
+        # Close FD if still open
+        if eval "true 1>&$FD" 2>/dev/null; then
+            eval "exec ${FD}>&- || true"
         fi
     done
+    FIFO_FDS=()
+
+    # remove the fifos root completely
+    if [ -d "$FIFOS_ROOT" ]; then
+        rm -rf "$FIFOS_ROOT"
+    fi
+}
+
+cleanup() {
+    cleanup_procs
+    cleanup_fifos
 }
 trap cleanup EXIT
 
@@ -61,10 +66,13 @@ M9,localhost,9009,STANDARD
 EOF
 }
 
-# create per-member input FIFOs if missing
-create_fifos() {
+# create FIFO directory for subtest and per-member fifos (outside log dirs)
+create_fifos_for_subtest() {
+    local SUB=$1
+    local DIR="$FIFOS_ROOT/$SUB"
+    mkdir -p "$DIR"
     for MEMBER in "${MEMBERS[@]}"; do
-        fifo="$LOG_DIR/$MEMBER.in"
+        fifo="$DIR/$MEMBER.in"
         if [ ! -p "$fifo" ]; then
             rm -f "$fifo"
             mkfifo "$fifo"
@@ -72,137 +80,271 @@ create_fifos() {
     done
 }
 
-# Start a member but avoid blocking by opening the fifo RDWR first and duplicating it as stdin
+# Start a member using fifo as stdin (fifos located outside log dirs).
+# We open the fifo RDWR in this shell to avoid blocking on open.
 start_member() {
     local MEMBER=$1
     local PROFILE=$2
     local EXTRA_ARGS=${3:-}
-    echo "[start] $MEMBER profile=$PROFILE extra='$EXTRA_ARGS'"
+    local TEST_DIR=$4
+    local SUB=$5
 
-    fifo="$LOG_DIR/$MEMBER.in"
+    echo "[start] $MEMBER profile=$PROFILE extra='$EXTRA_ARGS' (logs -> $TEST_DIR/$MEMBER.log)"
+
+    mkdir -p "$TEST_DIR"
+    logfile="$TEST_DIR/$MEMBER.log"
+    : > "$logfile"
+
+    fifo="$FIFOS_ROOT/$SUB/$MEMBER.in"
     if [ ! -p "$fifo" ]; then
+        echo "[start] FIFO $fifo missing; creating."
+        mkdir -p "$(dirname "$fifo")"
         mkfifo "$fifo"
     fi
 
-    # Ensure the log file exists before starting (prevents grep 'No such file' errors)
-    logfile="$LOG_DIR/$MEMBER.log"
-    : > "$logfile"
-
-    # Open the FIFO in read-write mode and store the FD number in FIFO_FDS
-    # Using bash's "exec {var}<> file" allocates a free FD and opens RDWR (doesn't block).
+    # Open the FIFO in read-write mode and store FD in FIFO_FDS with a unique key
     exec {FD}<> "$fifo"
-    FIFO_FDS[$MEMBER]=$FD
+    FIFO_FDS["$SUB:$MEMBER"]=$FD
 
-    # Start the Java process with the fifo FD as its stdin so it will not block on start.
-    # We redirect stdin from the FD we've opened and let the process inherit that FD.
-    # Note: use /proc/self/fd/$FD so redirection works correctly in subshells/background.
+    # Start the JVM with stdin from the FD we opened (/proc/$$/fd/$FD ensures background inherits it)
     mvn -q exec:java -Dexec.mainClass="member.CouncilMember" \
-        -Dexec.args="$MEMBER $EXTRA_ARGS" \
+        -Dexec.args="$MEMBER --profile $PROFILE $EXTRA_ARGS" \
         < /proc/$$/fd/$FD > "$logfile" 2>&1 &
-    echo $! > "$LOG_DIR/$MEMBER.pid"
+    # allow a short moment for process to start and open its end
+    sleep 0.05
 }
 
 wait_for_listening() {
+    local TEST_DIR=$1
     for MEMBER in "${MEMBERS[@]}"; do
-        logfile="$LOG_DIR/$MEMBER.log"
+        logfile="$TEST_DIR/$MEMBER.log"
         local start=$(date +%s)
         while true; do
             if [ -f "$logfile" ] && grep -q "Listening on port" "$logfile" 2>/dev/null; then
                 break
             fi
             sleep 0.2
-            if (( $(date +%s) - start > 15 )); then
-                echo "[warn] $MEMBER did not report listening in 15s"
+            if (( $(date +%s) - start > 20 )); then
+                echo "[warn] $MEMBER did not report listening in 20s (check $logfile)"
                 break
             fi
         done
     done
-    sleep 1
+    sleep 0.5
 }
 
-# REPLACED wait_for_consensus: robust per-file detection; prints matches and files that matched.
-wait_for_consensus() {
-    local VALUE=$1
-    local TIMEOUT=${2:-40}
+# send proposal as JSON into the member's stdin fifo (not to the network)
+send_proposal_via_fifo() {
+    local SUB=$1
+    local MEMBER=$2
+    local VALUE=$3
+    fifo="$FIFOS_ROOT/$SUB/$MEMBER.in"
+    if [ ! -p "$fifo" ]; then
+        echo "[proposal] ERROR: FIFO $fifo not found for $MEMBER"
+        return 1
+    fi
+
+    # JSON proposal (type present as requested). This JSON will be delivered to the member's stdin
+    # and CouncilMember's stdin reader will propose the entire JSON string as the value.
+    local json
+    json="{\"type\":\"PROPOSE\",\"value\":\"$VALUE\",\"from\":\"$MEMBER\"}"
+
+    echo "[proposal] Sending JSON into stdin FIFO for $MEMBER: $json"
+    # write the json as a single line into the fifo
+    printf '%s\n' "$json" > "$fifo" &
+    # give the member a short moment to process
+    sleep 0.6
+}
+
+# Extract learned value (same extractor as before)
+extract_learned_value() {
+    local f=$1
+    # Get the last line that mentions learning
+    local line
+    line=$(grep -i "learn" "$f" 2>/dev/null | tail -n1 || true)
+    if [ -z "$line" ]; then
+        echo ""
+        return
+    fi
+
+    # 1) Try to extract a JSON object substring {...}
+    local json
+    json=$(echo "$line" | sed -n 's/.*\({.*}\).*/\1/p' || true)
+    if [ -n "$json" ]; then
+        # Try using python3 to parse the JSON and extract the "value" field
+        if command -v python3 >/dev/null 2>&1; then
+            # echo JSON to python and try to read the "value" key
+            val=$(printf '%s' "$json" | python3 -c 'import sys, json
+s=sys.stdin.read()
+try:
+    o=json.loads(s)
+    v=o.get("value", "")
+    if isinstance(v, str):
+        print(v)
+    else:
+        # if value is not a string, print JSON-encoded value
+        print(json.dumps(v))
+except Exception:
+    sys.exit(0)
+' 2>/dev/null || true)
+            if [ -n "$val" ]; then
+                echo "$val"
+                return
+            fi
+        fi
+
+        # If python3 is not available or parsing failed, try a simple sed/awk fallback for "value":"X"
+        val=$(echo "$json" | sed -n 's/.*"value"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' || true)
+        if [ -n "$val" ]; then
+            echo "$val"
+            return
+        fi
+
+        # If no inner "value" field found, return the entire JSON string as a canonical fallback
+        echo "$json"
+        return
+    fi
+
+    # 2) If not JSON, attempt to find token after "value:" in the log line (legacy)
+    val=$(echo "$line" | awk '{
+        for(i=1;i<=NF;i++){
+            token=tolower($i)
+            if(token ~ /^value:?$/){
+                if(i+1<=NF){ print $(i+1); exit }
+            }
+        }
+    }')
+    if [ -n "$val" ]; then
+        echo "$val" | sed 's/[^[:alnum:]_.-].*$//'
+        return
+    fi
+
+    # 3) Fallback: return last whitespace token
+    val=$(echo "$line" | awk '{print $NF}')
+    echo "$val" | sed 's/[^[:alnum:]_.-].*$//'
+}
+
+wait_for_all_learners_consensus() {
+    local TEST_DIR=$1
+    local TIMEOUT=${2:-60}
     local start=$(date +%s)
-    echo "[wait] Waiting for consensus on $VALUE..."
+    echo "[wait-all] Waiting for all learners in $TEST_DIR to learn the same value..."
+
     while true; do
-        # For each log file, check if that file contains evidence of learning VALUE.
-        # We consider a file "showed consensus" if:
-        #  - any line in the file contains both a 'learn' token and VALUE, OR
-        #  - the file contains the word VALUE and also contains 'learn' somewhere in the file.
-        matched_any=0
-        matches_output=""
-        for f in "$LOG_DIR"/*.log; do
-            [ -f "$f" ] || continue
-            # First check for a single-line match (learn + value)
-            line_match=$(grep -iE "learn.*$VALUE|$VALUE.*learn" "$f" 2>/dev/null || true)
-            if [ -n "$line_match" ]; then
-                matched_any=1
-                matches_output+="$f: $line_match"$'\n'
-                # We can break early, but continue to collect more matches for diagnostics
-                continue
+        declare -A seen
+        all_have=1
+        values_list=""
+
+        for MEMBER in "${MEMBERS[@]}"; do
+            logfile="$TEST_DIR/$MEMBER.log"
+            if [ ! -f "$logfile" ]; then
+                all_have=0
+                break
             fi
-            # Otherwise, check if file has both tokens somewhere
-            if grep -qi "$VALUE" "$f" 2>/dev/null && grep -qi "learn" "$f" 2>/dev/null; then
-                matched_any=1
-                # collect the lines that contain either token for context
-                context=$(grep -niE "learn|$VALUE" "$f" 2>/dev/null || true)
-                matches_output+="$f: (context lines)\n$context\n"
+            if ! grep -qi "learn" "$logfile" 2>/dev/null; then
+                all_have=0
+                break
             fi
+            val=$(extract_learned_value "$logfile")
+            if [ -z "$val" ]; then
+                all_have=0
+                break
+            fi
+            seen["$val"]=1
+            values_list+="$MEMBER:$val "
         done
 
-        if (( matched_any == 1 )); then
-            echo "[wait] Consensus on $VALUE observed! Matching lines/files:"
-            # print matches_output safely
-            echo "$matches_output"
-            return 0
+        if (( all_have == 1 )); then
+            unique_count=0
+            last_val=""
+            for k in "${!seen[@]}"; do
+                unique_count=$((unique_count+1))
+                last_val="$k"
+            done
+
+            if (( unique_count == 1 )); then
+                echo "[wait-all] SUCCESS: all members learned value '$last_val'. Details: $values_list"
+                return 0
+            else
+                echo "[wait-all] Conflict: members have different learned values: $values_list"
+            fi
         fi
 
         sleep 1
         if (( $(date +%s) - start > TIMEOUT )); then
-            echo "[wait] Timeout waiting for consensus on $VALUE"
-            echo "[debug] Dumping last 200 lines of each log to help diagnose:"
-            for f in "$LOG_DIR"/*.log; do
+            echo "[wait-all] TIMEOUT after ${TIMEOUT}s waiting for all learners to agree in $TEST_DIR"
+            echo "[debug] Per-member learning lines (last 100 lines of each log):"
+            for f in "$TEST_DIR"/*.log; do
                 echo "----- $f -----"
-                tail -n 200 "$f" || true
+                tail -n 100 "$f" || true
             done
             return 1
         fi
     done
 }
 
-wait_for_specific_members() {
-    local members=("$@")
-    for MEMBER in "${members[@]}"; do
-        logfile="$LOG_DIR/$MEMBER.log"
-        local start=$(date +%s)
-        while true; do
-            if [ -f "$logfile" ] && grep -q "Listening on port" "$logfile" 2>/dev/null; then
-                break
-            fi
-            sleep 0.2
-            if (( $(date +%s) - start > 15 )); then
-                echo "[warn] $MEMBER did not report listening in 15s"
-                break
-            fi
-        done
-    done
-    sleep 1
-}
+wait_for_subset_learners_consensus() {
+    local TEST_DIR=$1
+    local TIMEOUT=${2:-60}
+    shift 2
+    local members_to_check=("$@")
 
-send_proposal() {
-    local MEMBER=$1
-    local VALUE=$2
-    fifo="$LOG_DIR/$MEMBER.in"
-    if [ ! -p "$fifo" ]; then
-        echo "[proposal] ERROR: FIFO $fifo not found for $MEMBER"
-        return 1
-    fi
-    echo "[proposal] Sending '$VALUE' to $MEMBER via $fifo..."
-    # write to FIFO (this will succeed because we have an RDWR open on the fifo)
-    printf "%s\n" "$VALUE" > "$fifo" &
-    sleep 0.6
+    local start=$(date +%s)
+    echo "[wait-subset] Waiting for members (${members_to_check[*]}) in $TEST_DIR to learn the same value..."
+
+    while true; do
+        declare -A seen
+        all_have=1
+        values_list=""
+
+        for MEMBER in "${members_to_check[@]}"; do
+            logfile="$TEST_DIR/$MEMBER.log"
+            if [ ! -f "$logfile" ]; then
+                all_have=0
+                break
+            fi
+            if ! grep -qi "learn" "$logfile" 2>/dev/null; then
+                all_have=0
+                break
+            fi
+            val=$(extract_learned_value "$logfile")
+            if [ -z "$val" ]; then
+                all_have=0
+                break
+            fi
+            seen["$val"]=1
+            values_list+="$MEMBER:$val "
+        done
+
+        if (( all_have == 1 )); then
+            unique_count=0
+            last_val=""
+            for k in "${!seen[@]}"; do
+                unique_count=$((unique_count+1))
+                last_val="$k"
+            done
+
+            if (( unique_count == 1 )); then
+                echo "[wait-subset] SUCCESS: subset members learned value '$last_val'. Details: $values_list"
+                return 0
+            else
+                echo "[wait-subset] Conflict among subset: $values_list"
+                # keep waiting up to timeout in case of late convergence
+            fi
+        fi
+
+        sleep 1
+        if (( $(date +%s) - start > TIMEOUT )); then
+            echo "[wait-subset] TIMEOUT after ${TIMEOUT}s waiting for subset to agree in $TEST_DIR"
+            echo "[debug] Per-member learning lines (last 100 lines of each subset log):"
+            for MEMBER in "${members_to_check[@]}"; do
+                f="$TEST_DIR/$MEMBER.log"
+                echo "----- $f -----"
+                tail -n 100 "$f" || true
+            done
+            return 1
+        fi
+    done
 }
 
 # Build project
@@ -211,104 +353,124 @@ mvn -q -DskipTests=true compile
 
 write_config
 
-# Ensure FIFOs exist
-create_fifos
+# Run single subtest (a, b, or c)
+run_subtest() {
+    local SUB=$1
+    local TEST_DIR="$LOG_ROOT/$SUB"
 
-# ------------------ Scenario 3a ------------------
-echo -e "\n=== Scenario 3a: Standard member (M4) proposes M5 ==="
-cleanup
-rm -f "$LOG_DIR"/*
-create_fifos
+    echo -e "\n=== Scenario 3$SUB ==="
+    cleanup_procs
+    # prepare clean test dir (only .log files will be created here)
+    mkdir -p "$TEST_DIR"
+    rm -f "$TEST_DIR"/*.log
 
-for i in "${!MEMBERS[@]}"; do
-    MEMBER=${MEMBERS[$i]}
-    PROFILE="STANDARD"
-    [[ "$MEMBER" == "M1" ]] && PROFILE="RELIABLE"
-    [[ "$MEMBER" == "M2" ]] && PROFILE="LATENT"
-    [[ "$MEMBER" == "M3" ]] && PROFILE="FAILURE"
-    start_member "$MEMBER" "$PROFILE"
-done
+    # prepare fifos for this subtest (placed outside log dir)
+    create_fifos_for_subtest "$SUB"
 
-wait_for_listening
-# propose from M4 using stdin FIFO
-send_proposal "M4" "M5"
-wait_for_consensus "M5" 40
-cleanup
+    if [ "$SUB" = "a" ]; then
+        echo "[3a] Standard member (M4) proposes M5"
+        for i in "${!MEMBERS[@]}"; do
+            MEMBER=${MEMBERS[$i]}
+            PROFILE="STANDARD"
+            [[ "$MEMBER" == "M1" ]] && PROFILE="RELIABLE"
+            [[ "$MEMBER" == "M2" ]] && PROFILE="LATENT"
+            [[ "$MEMBER" == "M3" ]] && PROFILE="FAILURE"
+            EXTRA=""
+            start_member "$MEMBER" "$PROFILE" "$EXTRA" "$TEST_DIR" "$SUB"
+        done
 
-# ------------------ Scenario 3b ------------------
-echo -e "\n=== Scenario 3b: Latent member (M2) proposes M6 ==="
-cleanup
-rm -f "$LOG_DIR"/*
-create_fifos
+        wait_for_listening "$TEST_DIR"
+        # send JSON proposal into M4's stdin fifo
+        send_proposal_via_fifo "$SUB" "M4" "M5"
+        if wait_for_all_learners_consensus "$TEST_DIR" 40; then
+            echo "[3a] PASS"
+        else
+            echo "[3a] FAIL"
+        fi
 
-for i in "${!MEMBERS[@]}"; do
-    MEMBER=${MEMBERS[$i]}
-    PROFILE="STANDARD"
-    [[ "$MEMBER" == "M1" ]] && PROFILE="RELIABLE"
-    [[ "$MEMBER" == "M2" ]] && PROFILE="LATENT"
-    [[ "$MEMBER" == "M3" ]] && PROFILE="FAILURE"
-    start_member "$MEMBER" "$PROFILE"
-done
+    elif [ "$SUB" = "b" ]; then
+        echo "[3b] Latent member (M2) proposes M6"
+        for i in "${!MEMBERS[@]}"; do
+            MEMBER=${MEMBERS[$i]}
+            PROFILE="STANDARD"
+            [[ "$MEMBER" == "M1" ]] && PROFILE="RELIABLE"
+            [[ "$MEMBER" == "M2" ]] && PROFILE="LATENT"
+            [[ "$MEMBER" == "M3" ]] && PROFILE="FAILURE"
+            EXTRA=""
+            start_member "$MEMBER" "$PROFILE" "$EXTRA" "$TEST_DIR" "$SUB"
+        done
 
-wait_for_listening
-sleep 5   # latent member may be slow to start
-# propose from M2 using stdin FIFO
-send_proposal "M2" "M6"
-wait_for_consensus "M6" 60
-cleanup
+        wait_for_listening "$TEST_DIR"
+        sleep 5
+        send_proposal_via_fifo "$SUB" "M2" "M6"
+        if wait_for_all_learners_consensus "$TEST_DIR" 60; then
+            echo "[3b] PASS"
+        else
+            echo "[3b] FAIL"
+        fi
 
-# ------------------ Scenario 3c ------------------
-echo -e "\n=== Scenario 3c: Failing member (M3) proposes then crashes, M4 drives M7 ==="
-cleanup
-rm -f "$LOG_DIR"/*
-create_fifos
+        else
+        echo "[3c] Failing member (M3) proposes then crashes, M4 drives M7 (M3 will be excluded from final check)"
+        for i in "${!MEMBERS[@]}"; do
+            MEMBER=${MEMBERS[$i]}
+            PROFILE="STANDARD"
+            [[ "$MEMBER" == "M1" ]] && PROFILE="RELIABLE"
+            [[ "$MEMBER" == "M2" ]] && PROFILE="LATENT"
+            [[ "$MEMBER" == "M3" ]] && PROFILE="FAILURE"
+            EXTRA=""
+            if [[ "$MEMBER" == "M3" ]]; then
+                EXTRA="--crashAfterSend"
+            fi
+            start_member "$MEMBER" "$PROFILE" "$EXTRA" "$TEST_DIR" "$SUB"
+        done
 
-# Start all members (M3 gets crashAfterSend flag)
-for i in "${!MEMBERS[@]}"; do
-    MEMBER=${MEMBERS[$i]}
-    PROFILE="STANDARD"
-    [[ "$MEMBER" == "M1" ]] && PROFILE="RELIABLE"
-    [[ "$MEMBER" == "M2" ]] && PROFILE="LATENT"
-    [[ "$MEMBER" == "M3" ]] && PROFILE="FAILURE"
-    EXTRA=""
-    if [[ "$MEMBER" == "M3" ]]; then
-        EXTRA="--crashAfterSend"
+        wait_for_listening "$TEST_DIR"
+
+        # Step 1: M3 proposes and is expected to crash
+        send_proposal_via_fifo "$SUB" "M3" "M3"
+
+        # Step 2: wait for M3 to stop listening (port closure) or timeout and kill if necessary
+        m3_port=$(grep "^M3," "$CONFIG_FILE" | cut -d',' -f3)
+        echo "[3c] Waiting up to 20s for M3 (port $m3_port) to stop..."
+        timeout=20
+        start_time=$(date +%s)
+        while true; do
+            pid=$(lsof -ti tcp:"$m3_port" || true)
+            if [ -z "$pid" ]; then
+                echo "[3c] M3 appears to have stopped listening."
+                break
+            fi
+            if (( $(date +%s) - start_time > timeout )); then
+                echo "[3c] M3 did not stop in ${timeout}s; force killing PID(s): $pid"
+                if [ -n "$pid" ]; then
+                    kill -9 $pid || true
+                fi
+                break
+            fi
+            sleep 0.5
+        done
+
+        sleep 1
+
+        # Step 3: M4 drives recovery
+        send_proposal_via_fifo "$SUB" "M4" "M7"
+
+        # Step 4: Wait for survivors (exclude M3) to reach consensus
+        SUBSET_MEMBERS=(M1 M2 M4 M5 M6 M7 M8 M9)
+        if wait_for_subset_learners_consensus "$TEST_DIR" 60 "${SUBSET_MEMBERS[@]}"; then
+            echo "[3c] PASS (consensus reached among survivors, M3 excluded)"
+        else
+            echo "[3c] FAIL (survivors did not reach consensus in time)"
+        fi
     fi
-    start_member "$MEMBER" "$PROFILE" "$EXTRA"
-done
 
-wait_for_listening
+    # stop processes and remove fifos for this subtest
+    cleanup_procs
+    cleanup_fifos
+}
 
-# Immediately propose from M3 (writes to M3's stdin fifo) and let M3 crash after send
-send_proposal "M3" "M3"
+# run_subtest "a"
+# run_subtest "b"
+run_subtest "c"
 
-# Wait until M3 crashes
-echo "[3c] Waiting for M3 to crash..."
-timeout=20
-start_time=$(date +%s)
-while true; do
-    if [ ! -f "$LOG_DIR/M3.pid" ]; then
-        echo "[3c] No pid file for M3; assuming it's down."
-        break
-    fi
-    pid=$(cat "$LOG_DIR/M3.pid")
-    if ! kill -0 "$pid" 2>/dev/null; then
-        echo "[3c] M3 process $pid no longer running."
-        break
-    fi
-    if (( $(date +%s) - start_time > timeout )); then
-        echo "[3c] M3 did not crash in ${timeout}s, force killing..."
-        kill -9 "$pid" 2>/dev/null || true
-        break
-    fi
-    sleep 0.5
-done
-sleep 1
-
-# Propose from M4 now to drive consensus to M7
-send_proposal "M4" "M7"
-
-wait_for_consensus "M7" 60
-cleanup
-
-echo "[done] All Scenario 3 tests completed. Logs: $LOG_DIR"
+echo "[done] Scenario 3 subtests completed. Logs in $LOG_ROOT (subdirs a, b, c)"

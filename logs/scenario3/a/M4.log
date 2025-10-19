@@ -1,0 +1,32 @@
+[Member M4] - Listening on port 9004
+[Proposer M4] Received stdin proposal: {"type":"PROPOSE","value":"M5","from":"M4"}
+[Proposer M4] Starting proposal M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
+[Proposer M4] Sent Prepare for M4:1 to [M1, M2, M3, M4, M5, M6, M7, M8, M9]
+[Proposer M4] Received Promise for M4:1 from Acceptor M1
+[Acceptor M4] Received Prepare(M4:1) from Proposer M4
+[Acceptor M4] Sent Promise for M4:1 to Proposer M4
+[Proposer M4] Received Promise for M4:1 from Acceptor M3
+[Proposer M4] Received Promise for M4:1 from Acceptor M8
+[Proposer M4] Received Promise for M4:1 from Acceptor M7
+[Proposer M4] Received Promise for M4:1 from Acceptor M4
+[Proposer M4] Sent Accept Request for M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
+[Proposer M4] Received Promise for M4:1 from Acceptor M6
+[Proposer M4] Sent Accept Request for M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
+[Proposer M4] Received Promise for M4:1 from Acceptor M5
+[Proposer M4] Sent Accept Request for M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
+[Proposer M4] Received Promise for M4:1 from Acceptor M9
+[Proposer M4] Sent Accept Request for M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
+[Acceptor M4] Received AcceptRequest(M4:1, '{"type":"PROPOSE","value":"M5","from":"M4"}') from Proposer M4
+[Acceptor M4] Accepted proposal M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
+[Acceptor M4] Received AcceptRequest(M4:1, '{"type":"PROPOSE","value":"M5","from":"M4"}') from Proposer M4
+[Acceptor M4] Accepted proposal M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
+[Member M4] Shutting down...
+[Acceptor M4] Received AcceptRequest(M4:1, '{"type":"PROPOSE","value":"M5","from":"M4"}') from Proposer M4
+[Acceptor M4] Accepted proposal M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
+Learner M4 has learned the value: {"type":"PROPOSE","value":"M5","from":"M4"} for proposal number: M4:1
+Learner M4 has learned the value: {"type":"PROPOSE","value":"M5","from":"M4"} for proposal number: M4:1
+[Acceptor M4] Received AcceptRequest(M4:1, '{"type":"PROPOSE","value":"M5","from":"M4"}') from Proposer M4
+[Acceptor M4] Accepted proposal M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
+Learner M4 has learned the value: {"type":"PROPOSE","value":"M5","from":"M4"} for proposal number: M4:1
+[Member M4] Failed to connect to localhost:9002 - Connection refused
+[Member M4] Failed to connect to localhost:9001 - Connection refused

@@ -1,0 +1,18 @@
+[Member M1] - Listening on port 9001
+[Acceptor M1] Received Prepare(M2:1) from Proposer M2
+[Acceptor M1] Sent Promise for M2:1 to Proposer M2
+[Acceptor M1] Received AcceptRequest(M2:1, '{"type":"PROPOSE","value":"M6","from":"M2"}') from Proposer M2
+[Acceptor M1] Accepted proposal M2:1 with value '{"type":"PROPOSE","value":"M6","from":"M2"}'
+Learner M1 has learned the value: {"type":"PROPOSE","value":"M6","from":"M2"} for proposal number: M2:1
+[Acceptor M1] Received AcceptRequest(M2:1, '{"type":"PROPOSE","value":"M6","from":"M2"}') from Proposer M2
+[Acceptor M1] Accepted proposal M2:1 with value '{"type":"PROPOSE","value":"M6","from":"M2"}'
+[Acceptor M1] Received AcceptRequest(M2:1, '{"type":"PROPOSE","value":"M6","from":"M2"}') from Proposer M2
+[Acceptor M1] Accepted proposal M2:1 with value '{"type":"PROPOSE","value":"M6","from":"M2"}'
+[Acceptor M1] Received AcceptRequest(M2:1, '{"type":"PROPOSE","value":"M6","from":"M2"}') from Proposer M2
+[Acceptor M1] Accepted proposal M2:1 with value '{"type":"PROPOSE","value":"M6","from":"M2"}'
+Learner M1 has learned the value: {"type":"PROPOSE","value":"M6","from":"M2"} for proposal number: M2:1
+[Acceptor M1] Received AcceptRequest(M2:1, '{"type":"PROPOSE","value":"M6","from":"M2"}') from Proposer M2
+[Acceptor M1] Accepted proposal M2:1 with value '{"type":"PROPOSE","value":"M6","from":"M2"}'
+[Member M1] Failed to connect to localhost:9003 - Connection refused
+Learner M1 has learned the value: {"type":"PROPOSE","value":"M6","from":"M2"} for proposal number: M2:1
+[Member M1] Shutting down...

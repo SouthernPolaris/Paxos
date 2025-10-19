@@ -130,7 +130,13 @@ public class SocketTransport implements MemberTransport {
                     out.flush();
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                // If it's a connection problem, log a concise message (expected when a node has crashed).
+                if (e instanceof java.net.ConnectException || (e.getCause() != null && e.getCause() instanceof java.net.ConnectException)) {
+                    System.out.println("[Member " + memberId + "] Failed to connect to " + address.getHostName() + ":" + address.getPort() + " - " + e.getMessage());
+                } else {
+                    // For other exceptions, print stack trace to help debugging
+                    e.printStackTrace();
+                }
             }
         });
     }

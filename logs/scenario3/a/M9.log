@@ -1,0 +1,22 @@
+[Member M9] - Listening on port 9009
+[Acceptor M9] Received Prepare(M4:1) from Proposer M4
+[Acceptor M9] Sent Promise for M4:1 to Proposer M4
+[Acceptor M9] Received AcceptRequest(M4:1, '{"type":"PROPOSE","value":"M5","from":"M4"}') from Proposer M4
+[Acceptor M9] Accepted proposal M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
+[Acceptor M9] Received AcceptRequest(M4:1, '{"type":"PROPOSE","value":"M5","from":"M4"}') from Proposer M4
+[Acceptor M9] Accepted proposal M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
+[Member M9] Shutting down...
+[Acceptor M9] Received AcceptRequest(M4:1, '{"type":"PROPOSE","value":"M5","from":"M4"}') from Proposer M4
+[Acceptor M9] Accepted proposal M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
+Learner M9 has learned the value: {"type":"PROPOSE","value":"M5","from":"M4"} for proposal number: M4:1
+[Acceptor M9] Received AcceptRequest(M4:1, '{"type":"PROPOSE","value":"M5","from":"M4"}') from Proposer M4
+[Acceptor M9] Accepted proposal M4:1 with value '{"type":"PROPOSE","value":"M5","from":"M4"}'
+[Member M9] Failed to connect to localhost:9004 - Connection refused
+[Member M9] Failed to connect to localhost:9004 - Connection refused
+[Member M9] Failed to connect to localhost:9001 - Connection refused
+Learner M9 has learned the value: {"type":"PROPOSE","value":"M5","from":"M4"} for proposal number: M4:1
+[Member M9] Failed to connect to localhost:9003 - Connection refused
+[Member M9] Failed to connect to localhost:9004 - Connection refused
+[Member M9] Failed to connect to localhost:9002 - Connection refused
+[Member M9] Failed to connect to localhost:9005 - Connection refused
+[Member M9] Failed to connect to localhost:9007 - Connection refused

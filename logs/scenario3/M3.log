@@ -1,5 +1,0 @@
-[Member M3] - Listening on port 9003
-[Proposer M3] Received stdin proposal: M3
-[Proposer M3] Starting proposal M3:1 with value 'M3'
-[Member M3] Crashing after sending first message!
-[Member M3] Shutting down...
