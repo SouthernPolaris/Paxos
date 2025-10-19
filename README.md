@@ -1,6 +1,6 @@
 # Paxos Implementation
 
-This repository implements a simplified Paxos system. It contains Java source for Proposers, Acceptors, Learners, networking transports, and unit tests.
+This repository implements a simplified Paxos system. It contains Java source for Proposers, Acceptors, Learners, networking transports, and unit tests
 
 ## Prerequisites
 
