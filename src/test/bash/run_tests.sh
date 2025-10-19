@@ -108,7 +108,7 @@ run_simple_scenario() {
     cleanup_procs
 }
 
-# Scenario 3: FIFO-based proposals
+# Scenario 3
 create_fifos_for_subtest() {
     local SUB=$1
     local TEST_DIR="$LOG_ROOT/Scenario3/$SUB"
