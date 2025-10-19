@@ -101,8 +101,8 @@ public class Proposer {
                 .filter(p -> p.acceptedProposalNumber != null)
                 .max(Comparator.comparing(p -> new ProposalNumber(p.acceptedProposalNumber)));
 
-            if (highestAccepted.isPresent()) {
-                proposalValue = highestAccepted.get().acceptedProposalValue.toString();
+            if (highestAccepted.isPresent() && highestAccepted.get().acceptedProposalValue != null) {
+                proposalValue = highestAccepted.get().acceptedProposalValue;
                 System.out.println("[Proposer " + id + "] Updated proposal value to '" + proposalValue + "' based on prior accepted proposal");
             }
 
@@ -163,7 +163,15 @@ public class Proposer {
      * Notifies learners about the chosen proposal (placeholder for actual learner communication).
      */
     private void notifyLearners() {
+        Accepted acceptedMsg = new Accepted(id, proposalNumber, proposalValue);
+
+        String acceptedJson = gson.toJson(acceptedMsg);
+
         System.out.println("[Proposer " + id + "] Notifying learners about chosen proposal " + proposalNumber + " with value '" + proposalValue + "'");
+
+        for (int learnerId : acceptorIds) {
+            networkTransport.sendMessage(String.valueOf(learnerId), acceptedJson);
+        }
     }
 
     /**

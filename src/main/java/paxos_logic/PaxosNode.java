@@ -1,8 +1,11 @@
 package paxos_logic;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import network.MemberTransport;
-import java.util.Set;
 import paxos_util.*;
+
+import java.util.Set;
 
 public class PaxosNode {
     private final String memberId;
@@ -11,56 +14,62 @@ public class PaxosNode {
     private final Learner learner;
     private final MemberTransport memberTransport;
 
+    private final Gson gson = new Gson();
+
     public PaxosNode(String memberId, Set<Integer> acceptorIds, Set<Integer> learnerIds, MemberTransport memberTransport) {
         this.memberId = memberId;
         this.memberTransport = memberTransport;
 
-        this.proposer = new Proposer(Integer.parseInt(memberId.replace("M", "")), acceptorIds, memberTransport);
-        this.acceptor = new Acceptor(Integer.parseInt(memberId.replace("M", "")), memberTransport, learnerIds);
-        this.learner = new Learner(Integer.parseInt(memberId.replace("M", "")), acceptorIds.size());
+        int numericId = Integer.parseInt(memberId.replace("M", ""));
+        this.proposer = new Proposer(numericId, acceptorIds, memberTransport);
+        this.acceptor = new Acceptor(numericId, memberTransport, learnerIds);
+        this.learner = new Learner(numericId, acceptorIds.size());
 
-        memberTransport.startListening();
+        if (memberTransport != null) {
+            memberTransport.startListening();
+        }
     }
 
+    /**
+     * Fully Gson-ready message dispatcher
+     */
     public void handleMessage(String senderId, String message) {
-        String[] parts = message.split(":");
-        String messageType = parts[0];
-        String proposalNum = parts[2];
+        try {
+            // Try to detect the message type by reading a "type" field
+            BaseMessage base = gson.fromJson(message, BaseMessage.class);
+            if (base == null || base.type == null) {
+                System.out.println("[PaxosNode " + memberId + "] Unknown message format: " + message);
+                return;
+            }
 
-        String value = parts.length > 4 ? parts[3] : null;
+            int numericSender = Integer.parseInt(senderId.replace("M", ""));
 
-        switch (messageType) {
-            case "PREPARE":
-                Prepare prepare = new Prepare(new ProposalNumber(proposalNum));
-                acceptor.handlePrepare(prepare, Integer.parseInt(senderId.replace("M", "")));
-                break;
+            switch (base.type) {
+                case "PREPARE":
+                    Prepare prepare = gson.fromJson(message, Prepare.class);
+                    acceptor.handlePrepare(prepare, numericSender);
+                    break;
 
-            case "PROMISE":
-                Promise promise = new Promise(
-                    new ProposalNumber(proposalNum),
-                    parts[3],
-                    parts[4].isEmpty() ? null : Integer.parseInt(parts[4]),
-                    Integer.parseInt(senderId.replace("M", ""))
-                );
-                proposer.handlePromise(promise);
-                break;
+                case "PROMISE":
+                    Promise promise = gson.fromJson(message, Promise.class);
+                    proposer.handlePromise(promise);
+                    break;
 
-            case "ACCEPT_REQUEST":
-                AcceptRequest acceptRequest = new AcceptRequest(new ProposalNumber(proposalNum), value);
-                acceptor.handleAcceptRequest(acceptRequest, Integer.parseInt(senderId.replace("M", "")));
-                break;
+                case "ACCEPT_REQUEST":
+                    AcceptRequest acceptRequest = gson.fromJson(message, AcceptRequest.class);
+                    acceptor.handleAcceptRequest(acceptRequest, numericSender);
+                    break;
 
-            case "ACCEPTED":
-                Accepted accepted = new Accepted(
-                    Integer.parseInt(senderId.replace("M", "")),
-                    new ProposalNumber(proposalNum),
-                    value
-                );
-                learner.handleAccepted(accepted);
-                break;
+                case "ACCEPTED":
+                    Accepted accepted = gson.fromJson(message, Accepted.class);
+                    learner.handleAccepted(accepted);
+                    break;
 
-            default:
-                System.out.println("Unknown message type: " + messageType);
+                default:
+                    System.out.println("[PaxosNode " + memberId + "] Unknown message type: " + base.type);
+            }
+        } catch (JsonSyntaxException e) {
+            System.out.println("[PaxosNode " + memberId + "] Failed to parse JSON message: " + e.getMessage());
         }
     }
 
@@ -78,5 +87,12 @@ public class PaxosNode {
     
     public String getMemberId() { 
         return memberId; 
+    }
+
+    /**
+     * Helper class to detect the type of incoming message
+     */
+    private static class BaseMessage {
+        String type;
     }
 }

@@ -1,6 +1,8 @@
 package network;
 
 import paxos_logic.PaxosNode;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.*;
 import java.net.*;
@@ -20,6 +22,10 @@ public class SocketTransport implements MemberTransport {
 
     private ServerSocket serverSocket;
     private final ReentrantLock lock = new ReentrantLock();
+    private final Gson gson = new GsonBuilder().create();
+
+    private boolean crashAfterSend = false;
+    private boolean hasSentFirstMessage = false;
 
     public SocketTransport(String memberId, Integer port, Map<String, InetSocketAddress> members, PaxosNode paxosNode, Profile profile) {
         this.memberId = memberId;
@@ -32,38 +38,45 @@ public class SocketTransport implements MemberTransport {
     @Override
     public void startListening() {
         lock.lock();
-        
         try {
-
             serverSocket = new ServerSocket(port);
             System.out.println("[Member " + memberId + "] - Listening on port " + port);
-
-            new Thread(() -> {
-                while (!serverSocket.isClosed()) {
-                    try {
-                        Socket clientSocket = serverSocket.accept();
-                        handleSocket(clientSocket);
-                    } catch (IOException e) {
-                        if (!serverSocket.isClosed()) e.printStackTrace();
-                    }
-                }
-            }).start();
-
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             lock.unlock();
         }
+
+        new Thread(() -> {
+            while (true) {
+                lock.lock();
+                try {
+                    if (serverSocket == null || serverSocket.isClosed()) break;
+                    Socket clientSocket = serverSocket.accept();
+                    handleSocket(clientSocket);
+                } catch (IOException e) {
+                    if (serverSocket == null || serverSocket.isClosed()) break;
+                    e.printStackTrace();
+                } finally {
+                    lock.unlock();
+                }
+            }
+        }).start();
     }
 
     private void handleSocket(Socket clientSocket) {
         new Thread(() -> {
             try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))) {
-                String message;
-                while ((message = in.readLine()) != null) {
+                String jsonMessage;
+                while ((jsonMessage = in.readLine()) != null) {
                     int delay = simulateDelay();
                     Thread.sleep(delay);
-                    paxosNode.handleMessage(getSenderFromMessage(message), message);
+
+                    // Deserialize to a generic map to extract senderId
+                    Map<?, ?> map = gson.fromJson(jsonMessage, Map.class);
+                    String senderId = String.valueOf(map.get("fromMemberId"));
+
+                    paxosNode.handleMessage(senderId, jsonMessage);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -83,15 +96,9 @@ public class SocketTransport implements MemberTransport {
         return 0;
     }
 
-    private String getSenderFromMessage(String msg) {
-        return msg.split(":")[1];
-    }
-
     @Override
-    public void sendMessage(String targetId, String message) {
-        if (profile == Profile.FAILURE) {
-            return;
-        }
+    public void sendMessage(String targetId, Object message) {
+        if (profile == Profile.FAILURE) return;
 
         InetSocketAddress address = members.get(targetId);
         if (address == null) {
@@ -99,12 +106,14 @@ public class SocketTransport implements MemberTransport {
             return;
         }
 
+        String jsonMessage = gson.toJson(message);
+
         CompletableFuture.runAsync(() -> {
             try {
                 Thread.sleep(simulateDelay());
                 try (Socket socket = new Socket(address.getHostName(), address.getPort());
-                    PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
-                    out.println(message);
+                     PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
+                    out.println(jsonMessage);
                     out.flush();
                 }
             } catch (Exception e) {
@@ -118,7 +127,6 @@ public class SocketTransport implements MemberTransport {
         try {
             if (serverSocket != null) serverSocket.close();
         } catch (IOException ignored) {
-
         } finally {
             lock.unlock();
         }

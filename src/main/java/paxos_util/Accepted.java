@@ -1,6 +1,7 @@
 package paxos_util;
 
 public class Accepted {
+    public String type = "ACCEPTED";
     public final ProposalNumber proposalNumber;
     public final String proposalValue;
 

@@ -49,7 +49,7 @@ public class Acceptor {
                 Promise promise = new Promise(
                     proposalNum,
                     acceptedNumber != null ? acceptedNumber.toString() : null,
-                    acceptedValue != null ? Integer.parseInt(acceptedValue) : null,
+                    acceptedValue,
                     memberId
                 );
 
